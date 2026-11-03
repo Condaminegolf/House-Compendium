@@ -1,7 +1,6 @@
-// Fill these in ONLY after creating a dedicated Property Care project, running base schema plus V4 QR migration, and deploying pc-public Edge Function.
-// A Supabase PUBLISHABLE key is safe in a browser when the database and Storage policies enforce access.
-// NEVER put a service_role/secret key or an OpenAI API key in this file.
-window.PROPERTY_CARE_CONFIG = {
-  supabaseUrl: '',
-  publishableKey: ''
-};
+// Browser-safe configuration: only the Compendium URL and publishable key.
+// Never place Supabase service-role or OpenAI secrets in this public repository.
+window.PROPERTY_CARE_CONFIG = Object.freeze({
+  supabaseUrl: 'https://dvjczqxdwwfezjatfyoy.supabase.co',
+  publishableKey: 'sb_publishable_z217z2pR6Bf9NjVtS496Pg_QCk9vrj2'
+});
