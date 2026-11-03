@@ -1,0 +1,535 @@
+[
+  {
+    "title": "Power is out",
+    "subtitle": "Whole-house or partial power loss",
+    "keywords": [
+      "power",
+      "electric",
+      "blackout",
+      "light",
+      "electricity",
+      "kuryente",
+      "brownout"
+    ],
+    "steps": [
+      {
+        "key": "start",
+        "heading": "Is there smoke, sparks, electrical burning, water near electrics, fallen wires or an electric shock?",
+        "body": "Keep everyone away from hazards. Do not touch damaged electrical equipment or a wet switchboard.",
+        "options": [
+          {
+            "label": "Yes — unsafe",
+            "next": "urgent"
+          },
+          {
+            "label": "No — nothing unsafe noticed",
+            "next": "neighbours"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "neighbours",
+        "heading": "Do nearby houses or streetlights also have no power?",
+        "body": "Look from a safe place. Do not approach damaged lines or electrical infrastructure.",
+        "options": [
+          {
+            "label": "Yes — neighbours are also out",
+            "next": "area"
+          },
+          {
+            "label": "No — only this house",
+            "next": "switch"
+          },
+          {
+            "label": "I cannot tell",
+            "next": "ticket"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "area",
+        "heading": "This may be a wider power outage.",
+        "body": "Check your electricity network operator’s official outage information. If supply does not return or you are unsure, notify maintenance. Never touch fallen powerlines.",
+        "options": [
+          {
+            "label": "Power has returned",
+            "next": "resolved"
+          },
+          {
+            "label": "Still no power / not sure",
+            "next": "ticket"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "switch",
+        "heading": "Are the accessible safety switches or breakers visibly tripped?",
+        "body": "Only look if the switchboard is dry, undamaged and safely accessible. Never remove covers, touch wiring, replace fuses or approach a wet switchboard.",
+        "options": [
+          {
+            "label": "Yes — one is tripped",
+            "next": "reset"
+          },
+          {
+            "label": "No / cannot tell",
+            "next": "ticket"
+          },
+          {
+            "label": "It is unsafe to approach",
+            "next": "urgent"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "reset",
+        "heading": "If safe and permitted by the property guide, did a single reset restore power?",
+        "body": "Only operate an ordinary accessible switch if you are comfortable and the property instructions permit it. If it trips again, STOP — do not keep resetting it; request a licensed electrician.",
+        "options": [
+          {
+            "label": "Yes — power returned",
+            "next": "resolved"
+          },
+          {
+            "label": "No / it tripped again",
+            "next": "ticket"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "urgent",
+        "heading": "Stop. This may be dangerous.",
+        "body": "Keep clear of the hazard. For immediate danger, fire or injury call 000. Immediately contact your designated property emergency contact. Do not operate the switchboard or wait for an app ticket.",
+        "options": [],
+        "end": "urgent"
+      },
+      {
+        "key": "ticket",
+        "heading": "This needs maintenance attention.",
+        "body": "We can record the checks you have already completed. For loss of an essential power supply, contact your emergency maintenance number without waiting for the app.",
+        "options": [],
+        "end": "ticket"
+      },
+      {
+        "key": "resolved",
+        "heading": "Great — power appears to be back.",
+        "body": "If it trips again, stop resetting switches and request an electrician.",
+        "options": [],
+        "end": "resolved"
+      }
+    ]
+  },
+  {
+    "title": "No water / low pressure",
+    "subtitle": "Taps, tank supply, water pressure",
+    "keywords": [
+      "water",
+      "tap",
+      "pressure",
+      "tank",
+      "pump",
+      "tubig"
+    ],
+    "steps": [
+      {
+        "key": "start",
+        "heading": "Is there a burst pipe, major leak, flooding or water near electricity?",
+        "body": "Avoid wet electrical areas. A serious leak or loss of essential water may require an urgent response.",
+        "options": [
+          {
+            "label": "Yes",
+            "next": "urgent"
+          },
+          {
+            "label": "No",
+            "next": "scope"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "scope",
+        "heading": "Is the water problem affecting every tap?",
+        "body": "Check a second tap if it is safe to do so. Do not open pumps, pressure systems, electrical panels or bore equipment.",
+        "options": [
+          {
+            "label": "All taps",
+            "next": "whole"
+          },
+          {
+            "label": "One tap only",
+            "next": "single"
+          },
+          {
+            "label": "Not sure",
+            "next": "ticket"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "whole",
+        "heading": "Is there a known supply interruption or an empty tank?",
+        "body": "Check only information visible on any approved property display. Water supplies vary by house: town, tank, bore or pump.",
+        "options": [
+          {
+            "label": "Yes — known interruption",
+            "next": "outage"
+          },
+          {
+            "label": "No / unsure",
+            "next": "ticket"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "single",
+        "heading": "Check the tap without dismantling fittings.",
+        "body": "Look for a visibly closed tap handle, any leaks or blocked outlet. Do not remove plumbing fittings or attempt pressurised repairs.",
+        "options": [
+          {
+            "label": "Water is working now",
+            "next": "resolved"
+          },
+          {
+            "label": "Still not working",
+            "next": "ticket"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "outage",
+        "heading": "A supply interruption may be affecting the house.",
+        "body": "Contact the nominated property contact for expected restoration. For a complete loss of water supply, use the emergency contact.",
+        "options": [
+          {
+            "label": "Water has returned",
+            "next": "resolved"
+          },
+          {
+            "label": "Still no water",
+            "next": "ticket"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "urgent",
+        "heading": "Stop and contact emergency maintenance.",
+        "body": "Avoid the leak and electrical hazards. A serious water leak or complete loss of supply needs prompt attention. Call 000 if there is immediate danger.",
+        "options": [],
+        "end": "urgent"
+      },
+      {
+        "key": "ticket",
+        "heading": "Ask maintenance to investigate.",
+        "body": "The maintenance team will need to identify whether this house uses town water, a tank, pump or bore.",
+        "options": [],
+        "end": "ticket"
+      },
+      {
+        "key": "resolved",
+        "heading": "Water is working again.",
+        "body": "Monitor for recurring low pressure or visible leaks.",
+        "options": [],
+        "end": "resolved"
+      }
+    ]
+  },
+  {
+    "title": "Leaking tap or pipe",
+    "subtitle": "Drips, wet cupboards or leaks",
+    "keywords": [
+      "leak",
+      "drip",
+      "wet",
+      "pipe",
+      "burst",
+      "tulo"
+    ],
+    "steps": [
+      {
+        "key": "start",
+        "heading": "Is water rapidly escaping, flooding the property or near an electrical outlet?",
+        "body": "Do not touch wet electrical equipment. Keep away from floodwater and slippery areas.",
+        "options": [
+          {
+            "label": "Yes",
+            "next": "urgent"
+          },
+          {
+            "label": "No — small drip",
+            "next": "small"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "small",
+        "heading": "Is the leak coming from an accessible tap or pipe?",
+        "body": "Take a photo from a safe position and check whether water is damaging floors or cupboards. Do not disassemble plumbing or overtighten fittings.",
+        "options": [
+          {
+            "label": "Dripping tap / minor leak",
+            "next": "ticket"
+          },
+          {
+            "label": "Leak has stopped",
+            "next": "resolved"
+          },
+          {
+            "label": "Uncertain",
+            "next": "ticket"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "urgent",
+        "heading": "Urgent leak — seek help now.",
+        "body": "Notify emergency maintenance immediately. Use an identified, safely accessible household isolation valve only if you have been shown how and it is safe. Call 000 for immediate danger.",
+        "options": [],
+        "end": "urgent"
+      },
+      {
+        "key": "ticket",
+        "heading": "Record the leak for maintenance.",
+        "body": "Include where the leak is and whether the area or contents are getting wet.",
+        "options": [],
+        "end": "ticket"
+      },
+      {
+        "key": "resolved",
+        "heading": "No active leak visible.",
+        "body": "Report it if water damage remains or the leak returns.",
+        "options": [],
+        "end": "resolved"
+      }
+    ]
+  },
+  {
+    "title": "Air conditioner not cooling",
+    "subtitle": "Basic remote and filter checks",
+    "keywords": [
+      "air conditioner",
+      "aircon",
+      "a/c",
+      "cool",
+      "heat",
+      "air conditioning"
+    ],
+    "steps": [
+      {
+        "key": "start",
+        "heading": "Are there sparks, burning smells, smoke or water dripping onto electrics?",
+        "body": "Switch off by normal controls only if safe, stay clear, and report immediately.",
+        "options": [
+          {
+            "label": "Yes",
+            "next": "urgent"
+          },
+          {
+            "label": "No",
+            "next": "settings"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "settings",
+        "heading": "Is the remote set to COOL and the temperature lower than the room?",
+        "body": "Check the display, remote batteries and accessible settings. Do not open the outdoor unit or electrical panels.",
+        "options": [
+          {
+            "label": "Changed setting — now cooling",
+            "next": "resolved"
+          },
+          {
+            "label": "Correct setting but not cooling",
+            "next": "filters"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "filters",
+        "heading": "Is the indoor filter visibly blocked and safely removable according to its manual?",
+        "body": "Only clean an accessible removable filter if its approved instructions allow it. Turn the unit off first. No ladders, electrical covers or refrigerant work.",
+        "options": [
+          {
+            "label": "Cleaned, now cooling",
+            "next": "resolved"
+          },
+          {
+            "label": "Not accessible / still not cooling",
+            "next": "ticket"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "urgent",
+        "heading": "Stop using the unit and report immediately.",
+        "body": "Do not handle damaged electrical equipment. Call 000 for immediate danger.",
+        "options": [],
+        "end": "urgent"
+      },
+      {
+        "key": "ticket",
+        "heading": "Maintenance should inspect the air conditioner.",
+        "body": "Include any error code, make/model if visible, and whether the unit starts.",
+        "options": [],
+        "end": "ticket"
+      },
+      {
+        "key": "resolved",
+        "heading": "Air conditioner is working.",
+        "body": "Keep filters maintained according to the specific model instructions.",
+        "options": [],
+        "end": "resolved"
+      }
+    ]
+  },
+  {
+    "title": "Toilet blocked / overflowing",
+    "subtitle": "Safe first checks",
+    "keywords": [
+      "toilet",
+      "blocked",
+      "drain",
+      "overflow",
+      "sewer",
+      "barado"
+    ],
+    "steps": [
+      {
+        "key": "start",
+        "heading": "Is sewage overflowing or is the only toilet unusable?",
+        "body": "Avoid direct contact with sewage. Do not flush repeatedly or mix drain chemicals.",
+        "options": [
+          {
+            "label": "Yes",
+            "next": "urgent"
+          },
+          {
+            "label": "No — partial blockage",
+            "next": "simple"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "simple",
+        "heading": "Is there a suitable toilet plunger available?",
+        "body": "A gentle attempt may help if you have been shown safe use. Never use harsh chemicals, makeshift tools or disassemble the toilet.",
+        "options": [
+          {
+            "label": "It now flushes normally",
+            "next": "resolved"
+          },
+          {
+            "label": "Still blocked / no plunger",
+            "next": "ticket"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "urgent",
+        "heading": "Request urgent maintenance.",
+        "body": "Stop using the affected toilet and isolate the area. Notify emergency maintenance without waiting for a digital ticket.",
+        "options": [],
+        "end": "urgent"
+      },
+      {
+        "key": "ticket",
+        "heading": "Record the blockage.",
+        "body": "Tell maintenance whether other toilets or drains are affected.",
+        "options": [],
+        "end": "ticket"
+      },
+      {
+        "key": "resolved",
+        "heading": "Toilet appears clear.",
+        "body": "Report any repeated blockage or sewage smell.",
+        "options": [],
+        "end": "resolved"
+      }
+    ]
+  },
+  {
+    "title": "Yard / irrigation issue",
+    "subtitle": "Lawns, hoses and sprinklers",
+    "keywords": [
+      "yard",
+      "garden",
+      "sprinkler",
+      "irrigation",
+      "lawn",
+      "grass",
+      "hose",
+      "mower"
+    ],
+    "steps": [
+      {
+        "key": "start",
+        "heading": "Are there exposed wires, hazardous chemicals, damaged machinery or a serious water leak?",
+        "body": "Stop work and move clear of any hazardous equipment or water near electrics.",
+        "options": [
+          {
+            "label": "Yes",
+            "next": "urgent"
+          },
+          {
+            "label": "No",
+            "next": "simple"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "simple",
+        "heading": "Can you identify a simple visible issue without opening equipment?",
+        "body": "Look for a kinked hose, closed normal garden tap or visible sprinkler obstruction. Do not adjust pumps, electrical controls, underground pipes or machinery safety devices.",
+        "options": [
+          {
+            "label": "Corrected visible issue",
+            "next": "resolved"
+          },
+          {
+            "label": "Problem remains / unclear",
+            "next": "ticket"
+          }
+        ],
+        "end": ""
+      },
+      {
+        "key": "urgent",
+        "heading": "Stop the yard work.",
+        "body": "Keep others away from the hazard. Contact site maintenance; call 000 if there is immediate danger.",
+        "options": [],
+        "end": "urgent"
+      },
+      {
+        "key": "ticket",
+        "heading": "Report the yard issue.",
+        "body": "Describe location, what is not working and whether water is escaping.",
+        "options": [],
+        "end": "ticket"
+      },
+      {
+        "key": "resolved",
+        "heading": "Yard issue appears resolved.",
+        "body": "Monitor the area and report if the issue repeats.",
+        "options": [],
+        "end": "resolved"
+      }
+    ]
+  }
+]

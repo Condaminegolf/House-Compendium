@@ -1,0 +1,17 @@
+PROPERTY CARE V4 — EMPLOYEES DO NOT LOG IN
+
+NEW employee home:       index.html?house=DEMO-H01
+STAFF protected portal:  staff.html
+PRINT 30 QR stickers:    qr-generator.html
+
+1. Test the employee demo at ?house=DEMO-H01 (not a live job submission).
+2. For live operation, create a DEDICATED Supabase project (not Ascension or Golf).
+3. Run supabase/schema.sql, then supabase/qr-no-login-migration.sql.
+4. Deploy the pc-public Edge Function and configure CAPTCHA/abuse protections.
+5. Enter new project's URL + publishable key in config.js, and host the files.
+6. Admin signs in to staff.html, sets real house addresses and guide media.
+7. Admin opens qr-generator.html to generate and print real house-specific QR stickers.
+8. Employee scans sticker and sees everything for their house — NO LOGIN.
+
+Tickets remain private. Employees can open QR guides without accounts.
+Published house information is intentionally visible to anyone with the QR link.
