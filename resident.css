@@ -2,3 +2,11 @@
 
 /* House-specific inspection checklist */
 .inspection-item{border:1px solid var(--line);min-width:0;padding-top:12px}.inspection-item legend{font-weight:800;color:var(--ink);font-size:15px;padding:0 8px}.inspection-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}.inspection-choice{display:block;position:relative;cursor:pointer}.inspection-choice input{position:absolute;opacity:0;width:1px;height:1px}.inspection-choice span{display:block;border:1px solid var(--line);border-radius:10px;background:var(--warm);padding:10px 7px;text-align:center;font-size:12px;min-height:42px}.inspection-choice input:checked+span{background:#dceee2;border:2px solid var(--green);color:var(--green);font-weight:800;padding:9px 6px}.inspection-choice input:focus-visible+span{outline:3px solid #b8d8c5;outline-offset:2px}@media(min-width:560px){.inspection-choices{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* Imported spreadsheet knowledge attached to the scanned house */
+.knowledge-topic summary{cursor:pointer;list-style-position:outside;padding:4px 2px;font-size:15px}
+.knowledge-topic[open]{border-color:#b6d3bf}
+.knowledge-topic .knowledge-copy{white-space:pre-line;overflow-wrap:anywhere;line-height:1.65;margin:14px 0;color:var(--ink)}
+.knowledge-section{margin:18px 0}
+.knowledge-section>.tiny{margin:0 0 12px}
+.knowledge-topic .secondary{margin-top:12px}
