@@ -121,7 +121,7 @@ root.addEventListener('click',async e=>{const b=e.target.closest('[data-action]'
    if(!session?.access_token)throw Error('Please sign in again.');
    b.disabled=true;b.textContent='Sending test…';
    try{
-     const response=await fetch(config.supabaseUrl.replace(/\\/$/,'')+'/functions/v1/pc-public',{method:'POST',headers:{'content-type':'application/json',apikey:config.publishableKey,authorization:'Bearer '+session.access_token},body:JSON.stringify({action:'test-email'})});
+     const response=await fetch(config.supabaseUrl.replace(/[/]$/,'')+'/functions/v1/pc-public',{method:'POST',headers:{'content-type':'application/json',apikey:config.publishableKey,authorization:'Bearer '+session.access_token},body:JSON.stringify({action:'test-email'})});
      const body=await response.json().catch(()=>({}));
      if(!response.ok)throw Error(body.error||'Email test failed.');
      toast('Test email accepted by the provider. Check your destination inbox.');
