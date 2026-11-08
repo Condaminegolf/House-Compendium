@@ -4,3 +4,12 @@
 
 /* Keep the private staff navigation accessible as modules grow. */
 .nav{flex-wrap:wrap}.mobile-nav{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}.mobile-nav button{flex-shrink:0;min-width:70px}
+
+/* Editor review for workbook-derived guidance */
+.knowledge-house-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 20px;max-height:360px;overflow:auto}
+.knowledge-house{display:flex;align-items:center;gap:8px;border:1px solid var(--border);padding:9px;border-radius:8px;background:#fafcf9;font-size:12px;cursor:pointer}
+.knowledge-house input{flex-shrink:0}
+.knowledge-confirm{display:flex;gap:12px;align-items:flex-start;padding:13px;background:#edf6ed;border-radius:9px;margin:12px 0;font-weight:650;font-size:13px}
+.knowledge-confirm input{flex-shrink:0;margin-top:2px}
+@media(max-width:720px){.knowledge-house-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.knowledge-house-grid{grid-template-columns:1fr}}
