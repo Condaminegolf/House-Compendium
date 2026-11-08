@@ -161,7 +161,7 @@ if(action==='house'&&req.method==='GET')return reply(await home(h));
 if(action==='ticket'&&req.method==='POST')return await ticket(h,b);
 if(action==='inspection'&&req.method==='POST')return await submitInspection(h,b);
 if(action==='upload-inspection-media'&&req.method==='POST')return await uploadInspectionMedia(h,b);
-if(action==='ticket-status'&&req.method==='POST'){const t=await getTicket(h,b);return t?reply({status:t.status}):reply({error:'Invalid receipt'},403)}
+if(action==='ticket-status'&&req.method==='POST'){const t=await getTicket(h,b);if(!t)return reply({error:'Invalid receipt'},403);const {data:n}=await db.from('pc_ticket_notifications').select('state').eq('ticket_id',t.id).maybeSingle();return reply({status:t.status,email_status:n?.state||'pending'});}
 if(action==='upload-ticket-media'&&req.method==='POST')return await upload(h,b);
 return reply({error:'Unknown action'},404);
 }catch(err){console.error('Property Care endpoint error',err);return reply({error:'Service unavailable'},500)}
