@@ -1,58 +1,59 @@
-# Property Care V4 — Scan a QR code; no employee sign-in
+# Property Care — House Compendium
 
-**Status:** Finished QR-first front-end prototype and backend migration/functions package; **NOT DEPLOYED**. The dedicated Supabase project still must be created/configured. The previous Ascension and Condamine Golf databases were NOT modified. The QR landing screen works in demo mode without a database.
+A mobile-first maintenance and inspection handbook for staff housing. Employees access their house by scanning its QR code **without signing in**. Maintenance staff and administrators use a protected dashboard.
 
-## The employee experience
+## Live links
 
-1. A unique QR label is fixed inside each of the 30 houses (fridge, entry information folder, etc.).
-2. Employee scans it with a phone camera. The link looks like `https://YOUR-SITE/index.html?house=RANDOM_QR_CODE`.
-3. The page opens the correct house straight away — **no registration, login, password or address selection**.
-4. Employee sees house details, published photo/video guides, step-by-step troubleshooting, regular-care checklists, and a maintenance request form.
-5. A ticket sent in production goes to the existing staff-only maintenance queue. The request status is remembered on the sending browser with an opaque receipt token. QR codes do not grant access to someone else's tickets.
-6. Maintenance staff, content editors and administrators use `staff.html` with email/password. **Only staff sign in** because they can access sensitive details, incoming photos and work orders.
+- Employee app: https://condaminegolf.github.io/House-Compendium/
+- Staff dashboard: https://condaminegolf.github.io/House-Compendium/staff.html
+- QR label generator: https://condaminegolf.github.io/House-Compendium/qr-generator.html
+- Supabase: https://supabase.com/dashboard/project/dvjczqxdwwfezjatfyoy
+- Project name: **Compendium** (`dvjczqxdwwfezjatfyoy`)
 
-If the user opens the app without a `house` parameter, it asks them to scan the QR code; there is a sample-house button for testing. `?house=DEMO-H01` to `?house=DEMO-H30` are harmless local demos. These demo QR identifiers must **NOT** be printed in occupied houses.
+## Employee experience
 
-## File guide
+1. Scan a house QR code. No employee account or password.
+2. Browse published troubleshooting and preventative maintenance guides. Approved photos and videos show the steps.
+3. Open **Inspection Checklist** to complete the original 11 inspection items, including the weather-related lawn exemption and the two dishwasher-filter items as supplied. Choose Done / Needs attention / Not checked / Not supplied where applicable. Submit optional notes and up to three photos or videos to a private inspection record.
+4. Open **Requests** for a maintenance issue. Submitting saves a private ticket against that house; staff see it in the dashboard. Photos/videos can be attached. Staff can update the ticket status.
+5. The maintenance email is attempted by a server-side Supabase Edge Function. The ticket is **saved even if sending is not configured or fails**. Email status is tracked separately.
 
-- `index.html`, `resident.css`, `resident.js`, `demo-guides.js`: new QR-first employee app, with working safe demonstration mode.
-- `staff.html`, `style.css`, `app.js`: original V3 staff editor / technician queue, now labelled staff-only.
-- `qr-generator.html`: printable 30-label sheet. Once staff are signed into the configured staff portal, it loads the live random `qr_code` for every house directly from the staff-permitted database. It can also generate labelled **demo-only** codes for layout testing.
-- `config.js`: project URL and *publishable* key only. Never place a service-role key or OpenAI API key here.
-- `supabase/schema.sql`: V3 base tables and staff permissions. **Install first on a new Property Care project only.**
-- `supabase/qr-no-login-migration.sql`: V4 changes: unguessable per-house QR codes, guest ticket/attachment support, and removal of legacy resident direct-access policies.
-- `supabase/functions/pc-public/index.ts`: restricted unauthenticated public endpoint; permits only (1) published house guides and relevant tasks, (2) new anonymous tickets, (3) attachment upload-token issue, and (4) status read with a secret ticket receipt. Uses a service-role key **only server-side**.
-- `supabase/optional-sample-drafts.sql`: six unapproved draft guides, for staff review, from V3.
-- `houses-template.csv`: placeholder property-address records.
+## Staff dashboard
 
-## Setup on a NEW dedicated Supabase project
+- **Properties:** replace the 30 placeholder records with real addresses, emergency contacts and equipment, then generate QR labels.
+- **Guides:** edit and approve troubleshooting instructions; the six initial guides are drafts until approved.
+- **Task library:** manage recurring routine-care tasks.
+- **Jobs:** review maintenance requests and email notification status, including privately attached photos and videos.
+- **Inspections:** view submitted checklists for all houses and identify items marked Needs attention.
+- **Email alerts (administrators only):** enter the maintenance inbox that should receive new requests.
 
-1. Create the project in a suitable region. Do **not** reuse the fitness or golf databases.
-2. In Supabase SQL Editor, execute `supabase/schema.sql`, then `supabase/qr-no-login-migration.sql` in that order. Review the security policies with your administrator.
-3. Create only staff accounts in Auth (administrator/editor/technician), disable employee/public sign-up, and add staff roles in `pc_staff_roles`. Example:
-   ```sql
-   insert into public.pc_staff_roles(user_id,role)
-   select id,'administrator' from auth.users where email='admin@example.com'
-   on conflict(user_id) do update set role='administrator';
-   ```
-4. Deploy the Edge Function at `supabase/functions/pc-public/` named `pc-public`, using `verify_jwt=false` because it supports QR users **without login**. The function uses managed project env secrets `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` and must never expose them to the website. Configure `PC_APP_ORIGIN` to the precise deployed origin (e.g. `https://example.github.io`).
-5. IMPORTANT BEFORE PRODUCTION: configure managed CAPTCHA/Turnstile verification, rate limits and spam/abuse monitoring. V4 includes a simple per-house 25/day cap, input length limits, a honeypot and attachment caps, but these are not adequate by themselves for an internet-exposed anonymous submission service. Test service-role access, storage policies, CORS and abuse controls before publishing stickers.
-6. Set `supabaseUrl` and `publishableKey` in `config.js`. Host `index.html`, `resident.css`, `resident.js`, `demo-guides.js`, `config.js`, `staff.html`, `style.css`, `app.js`, and `qr-generator.html` over HTTPS, ideally under one directory. No live tenant data belongs in a public repository.
-7. Log into `staff.html` as administrator. Update all 30 property addresses, water supplies, emergency maintenance numbers, and equipment. Approve safe guides. Photos/videos attached to **published guides** become viewable to anyone scanning the applicable QR link. Administrators can also mark **routine, property and equipment photos/videos** as explicitly public with a checkbox; unpublished reference media remains private. Published files use short-lived signed URLs. The administrator can set distinct **PUBLIC QR notes** separate from internal house notes.
-8. Open `qr-generator.html`, enter the final live application URL, choose **Load live house QR labels**, verify each address, then choose **Print labels**. QR links contain random `qr_code` values generated by the database. Do not use sample `DEMO-Hxx` codes in live housing.
-9. On two phones, test one QR per house, guided troubleshooting, a new ticket with and without a photo/video, ticket status, and the ticket's appearance in `staff.html` for technicians. Test all content permissions with staff and nonstaff and check poor-connectivity behavior.
+## Email provider setup — required before any real email is sent
 
-## Privacy and important limitations
+1. Choose or create a Resend account and verify a sender domain. See https://supabase.com/docs/guides/functions/examples/send-emails .
+2. In Compendium Supabase Dashboard > **Edge Function Secrets**, set:
+   - `RESEND_API_KEY` — the provider API key (secret).
+   - `PC_EMAIL_FROM` — a sender mailbox on the verified domain, e.g. `maintenance@your-domain.example`.
+3. Sign in as an **administrator** at `staff.html`, open **Email alerts**, and enter the intended destination email address. It is stored in the protected `pc_notification_settings` table.
+4. Submit a **non-urgent** test request through a real house QR link. Confirm the ticket reaches **Jobs**, the notification state becomes `sent`, and the inbox receives it. A provider-accepted message is not proof of inbox delivery. Pending/failed emails do not erase tickets.
+5. Never put API keys, service-role tokens or personal information into this public GitHub repository.
 
-- QR links are **convenience identifiers, not secure login credentials**. Anyone who photographs or receives a QR link can see that house's **published** content. Never show residents' personal details, private photos, internal passwords, security codes, or sensitive installation documentation there.
-- Employees are **not** asked for a login. Their name and contact number on maintenance requests are optional. They do not get a personalised cross-device ticket history; only requests previously made on that browser are visible there using an unguessable receipt. We do NOT share the technician queue with anonymous visitors.
-- Photos/videos in tickets are private and accessible only to appropriately authorised staff. The app limits ticket attachments to 3 each of max 25 MB. Video formats need on-device testing.
-- No ChatGPT engine has been connected yet. Guides are currently searched by title/keywords and follow editorial-approved steps. The QR flow is compatible with a later server-side AI assistant that uses only approved per-house knowledge.
-- English remains the operative language for **technical/safety instructions**. The UI has selectable language labels for English, Filipino and Cebuano; Ilocano/Hiligaynon preference is saved but their UI/safety content has **not** been translated. Review all translations with fluent employees before live rollout.
-- Routine checklist ticks are saved on the individual device (not auditable, not synced across residents). With no login, shared resident check-offs would require a separate agreed anonymity/privacy model.
-- For emergencies, **phone maintenance or 000**. A ticket is not an emergency alert. Guides need qualified safety review.
-- The live Edge Function, real QR printing, database migration and cloud uploads have **not** been executed/tested against a production project. Browser-level sample experience and static checks can be tested independently.
+### Staff access
 
-## Prototype tryout
+Employee accounts are never required. Staff need email/password Auth users and explicit roles in `pc_staff_roles`. If there is no administrator account yet, create a staff Auth user and assign their user ID the `administrator` role via Supabase SQL Editor.
 
-Open `index.html?house=DEMO-H01` after hosting. Without hosting, some browser `file://` environments may restrict scripts. The demo is standalone and does not submit real tickets. Test the navigation, guided branches, checklist and request form. For mobile scanning, host a copy over HTTPS and use `qr-generator.html` to generate sample QR labels with the hosted URL.
+## Privacy, security and rollout status
+
+- QR links identify a home but do not authorise staff access. Anyone who obtains a QR URL can view published house guidance; avoid placing personal details there.
+- Maintenance tickets, inspection reports and uploaded evidence remain private to authorised maintenance staff.
+- Inspection answers are stored in Compendium. Routine-care ticks currently remain local to the employee device.
+- Before distributing QR labels: replace addresses, approve safety-reviewed guides, add emergency phone contacts, configure stronger anti-spam protection, and test with two phones.
+- No ChatGPT conversational assistant, AI translation of safety instructions, or automatic email sending is possible until the relevant server credentials/services have been configured and tested.
+- A maintenance ticket is **not** an emergency notification. For urgent hazards telephone maintenance; for immediate danger call 000.
+
+## Files
+
+- `index.html`, `resident.js`, `resident.css` — QR employee app.
+- `staff.html`, `app.js`, `style.css` — protected staff app.
+- `config.js` — browser-safe Supabase URL and publishable key only.
+- `qr-generator.html` — QR labels.
+- Supabase database migrations and the Edge Function are installed in the live Compendium project. Keep migration backups in version control.
