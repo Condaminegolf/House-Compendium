@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#164b39">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Property Care | Maintenance request</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#203a2e;background:#f6f8f4}*{box-sizing:border-box}body{margin:0}header{background:#174a38;color:white;padding:18px 20px}header>div{max-width:790px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}header a{color:#ebf8ef;text-decoration:none;font-size:13px}main{max-width:790px;margin:22px auto 55px;padding:0 15px}.hero{background:#174a38;border-radius:17px;color:white;padding:23px;margin:0 0 14px}.hero h1{margin:6px 0;font-size:clamp(24px,5vw,32px)}.hero p{color:#daefe1;margin:0}.card{padding:21px;margin:12px 0;background:white;border:1px solid #d9e4da;border-radius:15px;box-shadow:0 4px 15px #24482e0b}.meta{color:#667568;font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}.tag{padding:6px 12px;border-radius:30px;background:#ecf4ea;color:#23583c;font-weight:700}.tag.pending{background:#fff3dd;color:#80581a}.copy{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65}.label{font-weight:700;font-size:13px;color:#375b42}.notice{background:#fff8e8;color:#6d4a19;padding:15px;border-radius:12px;line-height:1.5}.files{display:grid;gap:12px}.files img,.files video{max-width:100%;max-height:400px;border-radius:9px}.button{display:inline-block;padding:11px 15px;background:#17503c;color:white;border-radius:10px;text-decoration:none;font-weight:700}footer{font-size:12px;color:#6f7c72;margin-top:24px}
+</style>
+</head><body><header><div><strong>⌂ Property Care • Maintenance</strong><a href="index.html">House directory</a></div></header><main id="page"><div class="card">Opening maintenance request…</div></main><script src="config.js"></script><script>
+'use strict';
+(async()=>{
+ const page=document.getElementById('page');
+ const q=new URLSearchParams(location.search),h=new URLSearchParams(location.hash.replace(/^#/,''));
+ const ticketId=q.get('ref')||'',key=h.get('key')||'';
+ const str=(v)=>String(v??'');
+ const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=str(text);return n};
+ const card=()=>el('section','card');
+ const bad=message=>{page.replaceChildren();const b=card();b.append(el('h2','', 'Unable to open request'),el('p','',message));page.append(b);};
+ if(!/^[a-f0-9-]{36}$/i.test(ticketId)||!/^[a-f0-9]{64}$/.test(key)){bad('The email link is incomplete or invalid. Open the original maintenance email.');return;}
+ const cfg=window.PROPERTY_CARE_CONFIG||{};
+ if(!cfg.supabaseUrl||!cfg.publishableKey){bad('The Compendium connection is not configured.');return;}
+ try{
+  const response=await fetch(cfg.supabaseUrl.replace(/\/$/,'')+'/functions/v1/pc-public',{
+   method:'POST',headers:{'content-type':'application/json','apikey':cfg.publishableKey},
+   body:JSON.stringify({action:'ticket-view',ticket_id:ticketId,view_key:key}),cache:'no-store',referrerPolicy:'no-referrer'
+  });
+  const body=await response.json().catch(()=>({}));
+  if(!response.ok||!body.request)throw Error(body.error||'Could not open this request.');
+  const r=body.request;
+  page.replaceChildren();
+  const hero=el('section','hero');hero.append(el('small','','MAINTENANCE REQUEST'),el('h1','',r.title),el('p','',r.house+' • '+r.address));page.append(hero);
+  const status=card(),top=el('div','row');top.append(el('h2','','Current status'));
+  const tag=el('span','tag'+(r.status==='Resolved'?'':' pending'),r.status||'New');top.append(tag);status.append(top);
+  status.append(el('p','meta','Reported: '+new Date(r.created_at).toLocaleString('en-AU')));
+  if(r.updated_at)status.append(el('p','meta','Last updated: '+new Date(r.updated_at).toLocaleString('en-AU')));
+  page.append(status);
+  const info=card();info.append(el('h2','','Request details'),el('p','label','Problem description'),el('p','copy',r.details));
+  if(r.contact_name||r.contact_phone){info.append(el('p','label','Contact'));info.append(el('p','copy',[r.contact_name,r.contact_phone].filter(Boolean).join(' • ')));}
+  if(r.technician_notes){info.append(el('p','label','Maintenance team update'));info.append(el('p','copy',r.technician_notes));}
+  page.append(info);
+  if(r.files?.length){const media=card();media.append(el('h2','','Attached photos and videos'));const list=el('div','files');for(const f of r.files){const section=el('div');section.append(el('p','label',f.name));const item=el(f.mime_type?.startsWith('video/')?'video':'img');item.src=f.url;if(item.tagName==='VIDEO')item.controls=true;else item.alt=f.name;section.append(item);list.append(section);}media.append(list);page.append(media);}
+  const notice=el('div','notice','This link grants read-only access to one maintenance request. To change its status or mark it completed, use your separate private staff dashboard link. Do not forward this email link outside the maintenance team.');page.append(notice);
+  page.append(el('footer','','Property Care • Requests are held in Compendium Supabase. Urgent hazards require a telephone call.'));
+ }catch(error){bad(error.message||'This request is unavailable.');}
+})();
+</script></body></html>

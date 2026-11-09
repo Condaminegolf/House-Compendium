@@ -1,0 +1,18 @@
+EXAMPLE EMAIL (when Resend API credentials and verified sender are configured)
+
+To: accommodation@arubial.au
+Subject: New maintenance request — 12 Blyth St — No hot water
+
+NEW MAINTENANCE REQUEST
+House: 12 Blyth St
+Address: 12 Blyth St
+Issue: No hot water
+Description: No hot water in the bathroom.
+Contact: (if provided)
+Phone: (if provided)
+Reference: [unique ticket ID]
+View maintenance request: https://condaminegolf.github.io/House-Compendium/request.html?ref=[ticket ID]#key=[request-only private token]
+Use your private staff bookmark for changes or to mark the job completed.
+
+The link only grants read-only access to this single maintenance request and
+expires after 180 days. Actual email delivery has not yet been verified.

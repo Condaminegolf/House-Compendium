@@ -5,7 +5,9 @@ const PC = window.PROPERTY_CARE_CONFIG || {};
 const app = document.getElementById('app');
 const privateKey = new URLSearchParams(window.location.hash.replace(/^#/,'')).get('access') || '';
 const base = String(PC.supabaseUrl || '').replace(/\/$/, '') + '/functions/v1/pc-staff';
-const dataState = {payload:null,tab:'overview',editing:null,busy:false,flash:'',error:'',search:'',mediaLinks:{}};
+const requestedTicket = new URLSearchParams(location.search).get('ticket') || '';
+const selectedTicket = /^[a-f0-9-]{36}$/i.test(requestedTicket) ? requestedTicket : '';
+const dataState = {payload:null,tab:selectedTicket?'jobs':'overview',editing:null,busy:false,flash:'',error:'',search:'',mediaLinks:{},firstLinkScroll:true};
 const escapeHtml = value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const txt = (value,max=6000)=>String(value??'').trim().slice(0,max);
 const fmt = d=>d?new Date(d).toLocaleString('en-AU',{day:'2-digit',month:'short',year:'numeric',hour:'numeric',minute:'2-digit'}):'Not available';
@@ -55,8 +57,8 @@ function mediaPanel(kind,id,upload=false){
  return existing+add;
 }
 function jobs(){
- const list=arr('tickets').filter(t=>!dataState.search||[t.title,t.details,homeName(t.property_id),t.status,t.contact_name].join(' ').toLowerCase().includes(dataState.search.toLowerCase()));
- return `${section('MAINTENANCE QUEUE','Maintenance requests','Changes save directly to Compendium. No staff sign-in is needed from your private link.')}<div class="actions"><input class="search" data-search placeholder="Search jobs, addresses or status" value="${escapeHtml(dataState.search)}"><button class="btn" data-action="refresh">Refresh</button></div>${manager()?`<details class="card"><summary>+ Add a maintenance job</summary><form data-form="ticket-create">${dropdown('House','property_id',houseOptions(),arr('properties')[0]?.id)}${input('Issue title','title','','required maxlength="150"')}${area('Description','details','','required maxlength="2000"')}${input('Resident/contact name (optional)','contact_name')}${input('Phone (optional)','contact_phone')}<button class="btn primary" type="submit">Create maintenance request</button></form></details>`:''}<div class="list">${list.map(t=>`<article class="card"><div class="topline"><h3>${escapeHtml(t.title)}</h3>${statusTag(t.status)}</div><p class="small muted">${escapeHtml(homeName(t.property_id))} • ${fmt(t.created_at)} • ${escapeHtml(t.priority)}</p><p>${escapeHtml(t.details)}</p>${t.contact_name||t.contact_phone?`<p><b>Contact:</b> ${escapeHtml(t.contact_name||'Not provided')} ${t.contact_phone?' • '+escapeHtml(t.contact_phone):''}</p>`:''}<form data-form="ticket" data-id="${escapeHtml(t.id)}">${dropdown('Job status','status',[['New','New'],['In progress','In progress'],['Waiting on parts','Waiting on parts'],['Resolved','Resolved']],t.status)}${area('Technician notes','technician_notes',t.technician_notes||'','maxlength="4000"')}<button class="btn primary" type="submit">Save job update</button></form><details style="margin-top:12px"><summary>Photos/videos and troubleshooting checks</summary>${Array.isArray(t.checks)&&t.checks.length?`<pre style="white-space:pre-wrap">${escapeHtml(JSON.stringify(t.checks,null,2))}</pre>`:''}${mediaPanel('ticket',t.id)}</details></article>`).join('')||'<div class="empty">No matching maintenance requests.</div>'}</div>`;
+ const list=arr('tickets').filter(t=>!dataState.search||[t.title,t.details,homeName(t.property_id),t.status,t.contact_name].join(' ').toLowerCase().includes(dataState.search.toLowerCase())).sort((a,b)=>(a.id===selectedTicket?-1:b.id===selectedTicket?1:0)||(a.status==='Resolved'?1:0)-(b.status==='Resolved'?1:0)||String(b.created_at).localeCompare(String(a.created_at)));
+ return `${section('MAINTENANCE QUEUE','Maintenance requests','Changes save directly to Compendium. No staff sign-in is needed from your private link.')}<div class="actions"><input class="search" data-search placeholder="Search jobs, addresses or status" value="${escapeHtml(dataState.search)}"><button class="btn" data-action="refresh">Refresh</button></div>${manager()?`<details class="card"><summary>+ Add a maintenance job</summary><form data-form="ticket-create">${dropdown('House','property_id',houseOptions(),arr('properties')[0]?.id)}${input('Issue title','title','','required maxlength="150"')}${area('Description','details','','required maxlength="2000"')}${input('Resident/contact name (optional)','contact_name')}${input('Phone (optional)','contact_phone')}<button class="btn primary" type="submit">Create maintenance request</button></form></details>`:''}<div class="list">${list.map(t=>`<article id="job-${escapeHtml(t.id)}" class="card ${t.id===selectedTicket?'requested-ticket':''}"><div class="topline"><h3>${escapeHtml(t.title)}</h3>${statusTag(t.status)}</div><p class="small muted">${escapeHtml(homeName(t.property_id))} • ${fmt(t.created_at)} • ${escapeHtml(t.priority)}</p><p>${escapeHtml(t.details)}</p>${t.contact_name||t.contact_phone?`<p><b>Contact:</b> ${escapeHtml(t.contact_name||'Not provided')} ${t.contact_phone?' • '+escapeHtml(t.contact_phone):''}</p>`:''}<form data-form="ticket" data-id="${escapeHtml(t.id)}">${dropdown('Job status','status',[['New','New'],['In progress','In progress'],['Waiting on parts','Waiting on parts'],['Resolved','Resolved']],t.status)}${area('Technician notes','technician_notes',t.technician_notes||'','maxlength="4000"')}<div class="actions"><button class="btn primary" type="submit">Save job update</button>${t.status!=='Resolved'?`<button class="btn btn-complete" type="button" data-action="complete-ticket" data-id="${escapeHtml(t.id)}">✓ Mark completed</button>`:''}</div></form>${(()=>{const n=arr('notifications').find(x=>x.ticket_id===t.id);return n?`<div class="small muted" style="margin:12px 0">Email notification: ${statusTag(n.state)} ${n.state!=='sent'?`<button type="button" class="btn ghost" data-action="retry-email" data-id="${escapeHtml(t.id)}">Retry email</button>`:''}</div>`:'';})()}<details style="margin-top:12px"><summary>Photos/videos and troubleshooting checks</summary>${Array.isArray(t.checks)&&t.checks.length?`<pre style="white-space:pre-wrap">${escapeHtml(JSON.stringify(t.checks,null,2))}</pre>`:''}${mediaPanel('ticket',t.id)}</details></article>`).join('')||'<div class="empty">No matching maintenance requests.</div>'}</div>`;
 }
 function inspections(){
  const list=arr('inspections'),items=new Map(arr('items').map(i=>[i.code,i.title]));
@@ -86,12 +88,16 @@ function qr(){return `${section('PROPERTY LABELS','House QR codes','Print a dist
 function email(){
  const v=arr('emailSettings')[0]?.recipient_email||'';
  const notifications=arr('notifications');
- return `${section('NOTIFICATIONS','Maintenance email destination','New employee repair requests are saved first. Email delivery depends on the configured sending provider.')}<div class="card"><form data-form="email">${input('Send maintenance emails to','recipient_email',v,'type="email" required autocomplete="off"')}<button class="btn primary" type="submit">Save destination</button></form><p class="small muted">Your Supabase Edge Function also needs the verified sending-domain secret and Resend API key. This page does not store secret API keys.</p></div><div class="grid">${[['Sent',notifications.filter(n=>n.state==='sent').length],['Pending',notifications.filter(n=>n.state==='pending').length],['Failed',notifications.filter(n=>n.state==='failed').length]].map(([label,n])=>`<div class="stat"><strong>${n}</strong><small>${label} notifications</small></div>`).join('')}</div>`;
+ return `${section('NOTIFICATIONS','Maintenance email destination','New employee repair requests are saved first. Email delivery depends on the configured sending provider.')}<div class="card"><form data-form="email">${input('Send maintenance emails to','recipient_email',v,'type="email" required autocomplete="off"')}<button class="btn primary" type="submit">Save destination</button></form><p class="small muted">${dataState.payload?.email_provider_ready?'Email provider credentials appear configured. Check the per-request notification state below to confirm acceptance.':'Email sending is NOT configured: add RESEND_API_KEY and PC_EMAIL_FROM (verified sender) to Supabase secrets. Saving the recipient alone does not send emails.'} The link sent in each email opens that one maintenance request without revealing the private staff access token.</p></div><div class="grid">${[['Sent',notifications.filter(n=>n.state==='sent').length],['Pending',notifications.filter(n=>n.state==='pending').length],['Failed',notifications.filter(n=>n.state==='failed').length]].map(([label,n])=>`<div class="stat"><strong>${n}</strong><small>${label} notifications</small></div>`).join('')}</div>`;
 }
 function render(){
  if(!dataState.payload)return failureScreen('Staff workspace is not connected.');
  const view={overview,jobs,inspections,houses,workbook,guides,routines,equipment,email,qr}[dataState.tab]||overview;
  scaffold(view());
+ if(dataState.firstLinkScroll && selectedTicket && dataState.tab==='jobs') {
+   dataState.firstLinkScroll=false;
+   requestAnimationFrame(()=>document.getElementById('job-'+selectedTicket)?.scrollIntoView({behavior:'smooth',block:'center'}));
+ }
 }
 async function work(fn,success){if(dataState.busy)return;dataState.busy=true;try{await fn();await refresh(success)}catch(err){dataState.error=String(err.message||err);render()}finally{dataState.busy=false;}}
 app.addEventListener('click',async event=>{
@@ -100,6 +106,17 @@ app.addEventListener('click',async event=>{
  const action=event.target.closest('[data-action]');if(!action)return;
  if(action.dataset.action==='back'){dataState.editing=null;render();return;}
  if(action.dataset.action==='refresh'){await work(async()=>{},'Records refreshed');return;}
+ if(action.dataset.action==='complete-ticket'){
+   if(!window.confirm('Mark this maintenance request as completed?'))return;
+   const form=action.closest('article')?.querySelector('form[data-form="ticket"]');
+   const technician_notes=form?.querySelector('textarea[name="technician_notes"]')?.value||'';
+   await work(()=>api('ticket-update',{id:action.dataset.id,status:'Resolved',technician_notes}), 'Maintenance request marked complete and updated against the house.');
+   return;
+ }
+ if(action.dataset.action==='retry-email'){
+   await work(()=>api('notification-retry',{id:action.dataset.id}), 'Email delivery attempt updated. See notification status in the job.');
+   return;
+ }
  if(action.dataset.action==='media'){
    action.disabled=true;
    try{const res=await api('media-url',{id:action.dataset.id});const u=new URL(res.url);if(u.protocol!=='https:')throw Error('Invalid private link');dataState.mediaLinks[action.dataset.id]=u.href;render();}

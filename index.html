@@ -4,9 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#123e34">
+  <meta name="robots" content="noindex,nofollow">
   <meta name="description" content="Select your employee house for maintenance guides, regular care, inspections and maintenance requests. No login or QR scan required.">
   <title>Property Care — Choose Your House</title>
   <link rel="stylesheet" href="resident.css?v=20261109-houses">
+
+  <style>
+    .house-maintenance-section { margin: 20px 0; }
+    .house-maintenance-toolbar { display:flex;gap:9px;align-items:center;justify-content:space-between;flex-wrap:wrap; }
+    .house-maintenance-toolbar h2 {font-size:21px;margin:10px 0}
+    .house-maintenance-toolbar .secondary{font-size:12px;white-space:nowrap}
+    .house-maintenance-item{background:#fff;border:1px solid #dfebe1;border-radius:12px;margin:9px 0;padding:14px}
+    .house-maintenance-heading{display:flex;gap:12px;justify-content:space-between;align-items:flex-start}
+    .house-maintenance-heading strong{font-size:15px;overflow-wrap:anywhere}
+    .house-maintenance-status{border-radius:30px;padding:5px 10px;background:#fff1d8;color:#825822;font-size:11px;font-weight:800;white-space:nowrap}
+    .house-maintenance-status.new{background:#e8f1ff;color:#315d91}
+    .house-maintenance-status.complete{background:#e6f3e8;color:#2e7042}
+    .house-maintenance-history summary{font-weight:700;cursor:pointer}
+  </style>
   <style>
     .house-directory { width: min(840px, 100%); margin: 0 auto; padding: 18px 18px 48px; }
     .directory-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 6px 0 20px; }
@@ -61,7 +76,13 @@
       const validHouseLink = /^[a-f0-9]{24}$/.test(house) || /^PROPERTY-H\d{2,4}$/.test(house);
       if (validHouseLink) {
         const script = document.createElement('script');
-        script.src = 'resident.js?v=20261109-house-directory';
+        script.src = 'resident.js?v=20261109-maintenance';
+        script.onload = () => {
+          const addon = document.createElement('script');
+          addon.src = 'house-maintenance.js?v=20261109-maintenance';
+          addon.onload = () => { if (typeof window.render === 'function') window.render(); };
+          document.body.appendChild(addon);
+        };
         script.onerror = () => {
           root.innerHTML = '<div class="house-directory"><div class="directory-error">The house guide could not load. Check your connection and <a href="index.html">choose a house again</a>.</div></div>';
         };
