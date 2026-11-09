@@ -15,12 +15,23 @@ db.from('pc_guides').select('id,title,subtitle,keywords,steps,property_id').eq('
 db.from('pc_routines').select('id,title,details,every_days,property_id').eq('responsible','resident').or('property_id.is.null,property_id.eq.'+id).limit(100)]);
 for(const x of [er,gr,rr])if(x.error)throw x.error;
 const equipment=er.data||[],guides=gr.data||[],routines=rr.data||[];
-const [gm,rm,pm,em]=await Promise.all([getMedia('guide',guides.map((x:any)=>x.id),false),getMedia('routine',routines.map((x:any)=>x.id),true),getMedia('property',[id],true),getMedia('equipment',equipment.map((x:any)=>x.id),true)]);
+const assigned=await db.from('pc_compendium_assignments').select('entry_id').eq('property_id',id).limit(120);
+if(assigned.error)throw assigned.error;
+const ids=(assigned.data||[]).map((x:any)=>x.entry_id);
+let knowledge:any[]=[];
+if(ids.length){
+ const result=await db.from('pc_compendium_entries')
+   .select('id,section,category,title,body,sort_order')
+   .eq('review_status','published').in('id',ids).order('sort_order').limit(120);
+ if(result.error)throw result.error;
+ knowledge=result.data||[];
+}
+const [gm,rm,pm,em,km]=await Promise.all([getMedia('guide',guides.map((x:any)=>x.id),false),getMedia('routine',routines.map((x:any)=>x.id),true),getMedia('property',[id],true),getMedia('equipment',equipment.map((x:any)=>x.id),true),getMedia('knowledge',knowledge.map((x:any)=>x.id),false)]);
 const media=[];
-for(const m of [...gm,...rm,...pm,...em]){const {data,error}=await db.storage.from('pc-private-media').createSignedUrl(m.storage_path,3600);if(!error&&data?.signedUrl)media.push({kind:m.kind,entity_id:m.entity_id,step_key:m.step_key,mime_type:m.mime_type,caption:m.caption,transcript:m.transcript,filename:m.filename,signed_url:data.signedUrl})}
+for(const m of [...gm,...rm,...pm,...em,...km]){const {data,error}=await db.storage.from('pc-private-media').createSignedUrl(m.storage_path,3600);if(!error&&data?.signedUrl)media.push({kind:m.kind,entity_id:m.entity_id,step_key:m.step_key,mime_type:m.mime_type,caption:m.caption,transcript:m.transcript,filename:m.filename,signed_url:data.signedUrl})}
 const items=await db.from('pc_inspection_items').select('code,position,title,hint,if_supplied').eq('active',true).order('position');
 if(items.error)throw items.error;
-return {house:{id:h.id,name:h.name,address:h.address,site:h.site,water_supply:h.water_supply,hot_water_type:h.hot_water_type,emergency_contact_name:h.emergency_contact_name,emergency_contact_number:h.emergency_contact_number,approved_guide_notes:h.qr_public_notes},equipment,guides,routines,media,inspection_items:items.data||[]}
+return {house:{id:h.id,name:h.name,address:h.address,site:h.site,water_supply:h.water_supply,hot_water_type:h.hot_water_type,emergency_contact_name:h.emergency_contact_name,emergency_contact_number:h.emergency_contact_number,approved_guide_notes:h.qr_public_notes},equipment,guides,routines,knowledge,media,inspection_items:items.data||[]}
 }
 async function ticket(h:any,b:any){
 if(clean(b.website))return reply({error:'Invalid request'},400);
