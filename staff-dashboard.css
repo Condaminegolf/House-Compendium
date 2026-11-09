@@ -3,3 +3,6 @@
 /* House-scoped requests and email deep-link focus */
 .requested-ticket{border:2px solid #348253!important;background:#f4fbf5;scroll-margin:115px}
 .btn-complete{background:#e5f2e9!important;border:1px solid #86b99a!important;color:#195637!important;font-weight:750}
+
+/* Four primary staff tabs and management modules */
+.cp-management-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:18px 0 28px}.cp-management-item{text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-height:117px}.cp-management-item span{font-size:24px}.cp-management-item small{color:#63786d}.cp-back-manage{margin:8px 0 12px}.cp-job-filters{display:flex;gap:7px;overflow-x:auto;padding:3px 0 15px;scrollbar-width:thin}.cp-job-filters button{border:1px solid #c8d7cd;border-radius:18px;background:#fff;padding:8px 13px;white-space:nowrap;color:#24523b;font-size:12px;font-weight:650}.cp-job-filters button.active{background:#174a38;color:#fff;border-color:#174a38}.cp-history{margin-top:12px}.cp-done-note{background:#e9f5eb;border-radius:8px;padding:9px 12px;color:#225e38}.cp-followup{margin:15px 0 2px;background:#dfeee2;border-color:#99c6a4;font-weight:700}@media(max-width:650px){.cp-management-grid{grid-template-columns:1fr 1fr}.cp-management-item{min-height:100px;padding:14px}.cp-management-item strong{font-size:14px}}
