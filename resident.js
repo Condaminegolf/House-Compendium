@@ -10,7 +10,7 @@ const s = {house:null,equipment:[],guides:[],routines:[],knowledge:[],media:[],t
 const e = v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const el = sel=>document.querySelector(sel);
 const uuid4=()=>crypto.randomUUID?crypto.randomUUID():[...crypto.getRandomValues(new Uint8Array(16))].map((n,i)=>{if(i===6)n=(n&15)|64;if(i===8)n=(n&63)|128;return n.toString(16).padStart(2,'0')}).join('').replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/,'$1-$2-$3-$4-$5');
-const codeIsDemo = /^DEMO-H(?:0[1-9]|[12]\d|30)$/.test(houseCode);
+const codeIsDemo = /^DEMO-H(?:0[1-9]|[12]\d|3[0-3])$/.test(houseCode);
 const demoHouse = codeIsDemo ? houseCode.slice(5) : null;
 const supported = /^([A-Za-z0-9-]{6,72})$/.test(houseCode);
 const liveConfigured = Boolean(cfg.supabaseUrl && cfg.publishableKey);
