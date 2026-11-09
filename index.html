@@ -1,12 +1,63 @@
 <!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#123e34"><meta name="description" content="Scan the QR code to open helpful guides for your house. No sign in required.">
-<title>Property Care — Your house guide</title>
-<link rel="stylesheet" href="resident.css">
-</head><body><div id="app"><div class="loading-screen">⌂<p>Opening your house guide…</p></div></div>
-<script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.105.0/dist/umd/supabase.min.js" defer></script>
-<script src="demo-guides.js" defer></script>
-<script src="resident.js" defer></script>
-</body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#123e34">
+  <meta name="description" content="Scan your property QR code to view house-specific maintenance and inspection guides. No sign-in needed.">
+  <title>Property Care — Your House Guide</title>
+  <link rel="stylesheet" href="resident.css?v=20261109-qr">
+</head>
+<body>
+  <div id="app">
+    <div class="loading-screen">⌂<p>Opening Property Care…</p></div>
+  </div>
+
+  <!-- The public Supabase key belongs in the existing config.js; never add a secret key here. -->
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.105.0/dist/umd/supabase.min.js" defer></script>
+  <script>
+    'use strict';
+    (() => {
+      const root = document.getElementById('app');
+      const house = (new URLSearchParams(window.location.search).get('house') || '').trim();
+      const isRealHouseQr = /^[0-9a-f]{24}$/.test(house);
+      // Real QR links contain a 24-character random property identifier.
+      // Old DEMO-Hxx links must not be mistaken for real properties.
+      if (isRealHouseQr) {
+        const app = document.createElement('script');
+        app.src = 'resident.js?v=20261109-qr';
+        app.onerror = () => {
+          root.innerHTML = '<div class="intro"><span>⌂</span><h1>Unable to load Property Care</h1><p>Please check your connection and try scanning the house QR code again.</p><p class="tiny muted">If this continues, contact maintenance for help.</p></div>';
+        };
+        document.body.appendChild(app);
+        return;
+      }
+      // A bare website URL or demo/invalid code is NOT a real house.
+      // Do not load resident.js here: the older app would offer a sample house.
+      root.innerHTML = `
+        <div class="intro">
+          <span aria-hidden="true">⌂</span>
+          <h1>Property Care</h1>
+          <p>Housing guides, inspection checklists and maintenance requests for your house.</p>
+          <div class="card">
+            <h2>${house ? 'This is not a live house QR code' : 'Scan the QR code in your house'}</h2>
+            ${house
+              ? '<p>This link does not contain a valid property QR code. Please scan the printed QR sticker for your house instead.</p>'
+              : '<p>Use your phone camera to scan the QR sticker inside your house. Tap the link that appears to open your property information automatically.</p>'}
+            <p><strong>No password or employee sign-in required.</strong></p>
+          </div>
+          <div class="card" style="text-align:left">
+            <h2>What you can access</h2>
+            <p>🔧 Troubleshooting guides and repair help</p>
+            <p>🌱 Regular house and yard care</p>
+            <p>☑️ Inspection Checklist</p>
+            <p>🎫 Maintenance requests, including photos and videos</p>
+          </div>
+          <p class="tiny muted">Can't find the QR code? Contact your maintenance team for the correct sticker or link.</p>
+          <p class="tiny muted">Maintenance staff: <a href="staff.html">Open the protected staff dashboard</a></p>
+        </div>`;
+    })();
+  </script>
+</body>
+</html>
