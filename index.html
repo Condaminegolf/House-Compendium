@@ -22,6 +22,24 @@
     .house-maintenance-status.new{background:#e8f1ff;color:#315d91}
     .house-maintenance-status.complete{background:#e6f3e8;color:#2e7042}
     .house-maintenance-history summary{font-weight:700;cursor:pointer}
+
+    /* Visible on every page inside a house, including Something Wrong and Requests. */
+    .topinner { flex-wrap: wrap; }
+    .topinner .change-house-link {
+      display:inline-flex;align-items:center;justify-content:center;gap:6px;
+      padding:9px 13px;min-height:40px;flex-shrink:0;
+      font-size:13px;line-height:1.2;font-weight:750;
+      text-decoration:none;color:#134b36;background:#e8f3ea;
+      border:1px solid #b9d2c0;border-radius:11px;
+      white-space:nowrap;
+    }
+    .topinner .change-house-link:hover {background:#d7ebdc;}
+    .topinner .change-house-link:focus-visible {outline:3px solid #80ad92;outline-offset:2px;}
+    @media(max-width:520px){
+      .topinner .brand{flex:1 1 auto;min-width:0}
+      .topinner .change-house-link{margin-left:auto}
+      .topinner .language{flex:0 1 160px;max-width:100%}
+    }
   </style>
   <style>
     .house-directory { width: min(840px, 100%); margin: 0 auto; padding: 18px 18px 48px; }
@@ -76,6 +94,23 @@
       // not its private 24-character QR identifier.
       const validHouseLink = /^[a-f0-9]{24}$/.test(house) || /^PROPERTY-H\d{2,4}$/.test(house);
       if (validHouseLink) {
+
+        // The house screen is rebuilt whenever someone changes tabs.
+        // Add the switcher to the sticky header after each render. Observing
+        // only #app's direct children avoids any recursive mutation loop.
+        const showChangeHouseLink = () => {
+          const header = root.querySelector('.topinner');
+          if (!header || header.querySelector('.change-house-link')) return;
+          const link = document.createElement('a');
+          link.className = 'change-house-link';
+          link.href = 'index.html';
+          link.textContent = '← Change house';
+          link.setAttribute('aria-label', 'Back to house search');
+          header.appendChild(link);
+        };
+        const houseLinkObserver = new MutationObserver(showChangeHouseLink);
+        houseLinkObserver.observe(root, { childList: true });
+        showChangeHouseLink();
         const script = document.createElement('script');
         script.src = 'resident.js?v=20261109-maintenance';
         script.onload = () => {
