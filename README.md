@@ -1,5 +1,24 @@
 # Property Care — House Compendium
 
+## Accommodation spreadsheet integration — 9 November 2026
+
+The uploaded **Accommodation compendium data for app.xlsx** has been imported into the live **Compendium** Supabase database.
+
+- Workbook tabs: `Regular Care` and `Something wrong`; these feed the corresponding employee app sections.
+- 33 property columns were mapped in order to property IDs `H01` through `H33`. The original QR identifiers for the existing 30 properties were preserved; H31–H33 received new QR codes.
+- The workbook lists `37 WAMBO ST` twice. These are separate property records `H15` and `H16`, not automatically merged. Confirm which is which before printing labels.
+- The 39 nonempty instruction rows were imported, with 1,287 house-to-instruction assignments. Original text and worksheet row numbers are preserved.
+- The data contains identical guidance for every house, including descriptions of specific bore pumps, septic systems and donga electrical boards. **Do not assume those instructions are correct at each address.**
+- Six low-risk topics were published for employees; 33 need editorial/technical review. Unreviewed topics are only visible to staff in the **Workbook content** dashboard.
+- Editors can amend drafts, add photos/videos/transcripts, and leave review notes. Administrators can restrict a topic to selected houses and publish it after an explicit safety check.
+- Published entries load securely through the `pc-public` Edge Function according to the scanned house QR code. The anonymous app does not have direct read access to the private source tables.
+- The existing Inspection Checklist, ticket queue, email notification system, original troubleshooting guides and routine-care checklists were retained.
+
+The uploaded spreadsheet is the authoritative reference for original wording. The public repository intentionally **does not** contain a raw copy with all property names and instructions; those records are stored in Supabase with staff-only editing permissions.
+
+Remaining rollout work: identify H15/H16 clearly, check site-specific utility instructions, enter real emergency contacts, provide referenced guide videos, verify all 33 house QR labels, create the initial staff administrator (if not already done), and test the mobile site from employee phones. Maintenance email sending still requires the chosen recipient and a verified sender/provider secret.
+
+
 A mobile-first maintenance and inspection handbook for staff housing. Employees access their house by scanning its QR code **without signing in**. Maintenance staff and administrators use a protected dashboard.
 
 ## Live links
@@ -20,7 +39,7 @@ A mobile-first maintenance and inspection handbook for staff housing. Employees 
 
 ## Staff dashboard
 
-- **Properties:** replace the 30 placeholder records with real addresses, emergency contacts and equipment, then generate QR labels.
+- **Properties:** replace the 33 mapped records with real addresses, emergency contacts and equipment, then generate QR labels.
 - **Guides:** edit and approve troubleshooting instructions; the six initial guides are drafts until approved.
 - **Task library:** manage recurring routine-care tasks.
 - **Jobs:** review maintenance requests and email notification status, including privately attached photos and videos.
