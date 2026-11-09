@@ -8,6 +8,8 @@
   <meta name="description" content="Select your employee house for maintenance guides, regular care, inspections and maintenance requests. No login or QR scan required.">
   <title>Property Care — Choose Your House</title>
   <link rel="stylesheet" href="resident.css?v=20261109-houses">
+  <link rel="stylesheet" href="compendium-upgrade.css?v=20261109-s2">
+  <link rel="stylesheet" href="compendium-welcome.css?v=20261109-welcome1">
   <link rel="stylesheet" href="something-wrong.css?v=20261109-guided1">
 
   <style>
@@ -119,7 +121,24 @@
           addon.onload = () => {
             const wizard = document.createElement('script');
             wizard.src = 'something-wrong.js?v=20261109-guided1';
-            wizard.onload = () => { if (typeof window.render === 'function') window.render(); };
+            wizard.onload = () => {
+              const upgrade = document.createElement('script');
+              upgrade.src = 'compendium-upgrade.js?v=20261109-s2';
+              upgrade.onload = () => {
+                const welcome = document.createElement('script');
+                welcome.src = 'compendium-welcome.js?v=20261109-welcome1';
+                const continueToLanguage = () => {
+                  const language = document.createElement('script');
+                  language.src = 'compendium-language.js?v=20261109-s2';
+                  language.onload = () => { if (typeof window.render === 'function') window.render(); };
+                  document.body.appendChild(language);
+                };
+                welcome.onload = continueToLanguage;
+                welcome.onerror = continueToLanguage;
+                document.body.appendChild(welcome);
+              };
+              document.body.appendChild(upgrade);
+            };
             wizard.onerror = () => { if (typeof window.render === 'function') window.render(); };
             document.body.appendChild(wizard);
           };

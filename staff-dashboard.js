@@ -24,11 +24,11 @@ const dropdown=(label,name,items,value)=>`<div class="field"><label for="${escap
 const houseOptions=allowAll=>[...(allowAll?[['','All houses']]:[]),...arr('properties').map(x=>[x.id,homeName(x.id)])];
 const section=(eyebrow,title,subtitle)=>`<section class="banner"><small>${escapeHtml(eyebrow)}</small><h1>${escapeHtml(title)}</h1><p>${escapeHtml(subtitle)}</p></section>`;
 const note=x=>`<div class="notice">${escapeHtml(x)}</div>`;
-const managerSections=['houses','workbook','guides','routines','equipment','email','qr'];
+const managerSections=['houses','welcome','workbook','guides','routines','equipment','email','qr'];
 function tabs(){return [['overview','⌂','Dashboard'],['jobs','🛠️','Maintenance'],['inspections','☑','Inspections'],...(manager()?[['manage','⚙','Manage']]:[])];}
 function manage(){
  if(!manager())return overview();
- const sections=[['houses','🏡','Houses','Addresses, contact information and utilities'],['workbook','📘','Workbook','Approve house-specific instructions'],['guides','📚','Troubleshooting','Published guides and safe steps'],['routines','🌿','Regular care','House care and scheduled checks'],['equipment','⚙','Equipment','Appliances, locations and models'],['email','✉','Email alerts','Destination, provider and test'],['qr','▦','QR labels','Print house labels']];
+ const sections=[['houses','🏡','Houses','Addresses, contact information and utilities'],['welcome','📖','Welcome & Local Info','Shopping, medical contacts, waste and nearby services'],['workbook','📘','Workbook','Approve house-specific instructions'],['guides','📚','Troubleshooting','Published guides and safe steps'],['routines','🌿','Regular care','House care and scheduled checks'],['equipment','⚙','Equipment','Appliances, locations and models'],['email','✉','Email alerts','Destination, provider and test'],['qr','▦','QR labels','Print house labels']];
  return `${section('MANAGEMENT','Manage accommodation','Everything required to maintain your properties, guides and notifications.')}<div class="cp-management-grid">${sections.map(([id,icon,name,description])=>`<button class="item cp-management-item" type="button" data-tab="${id}"><span>${icon}</span><strong>${name}</strong><small>${description}</small></button>`).join('')}</div>`;
 }
 
@@ -92,6 +92,41 @@ function equipment(){
  return `${section('HOUSE EQUIPMENT','Equipment register','Record house appliances and models to improve troubleshooting.')}<div class="card"><h3>${x.id?'Edit equipment':'Add equipment'}</h3><form data-form="equipment" data-id="${escapeHtml(x.id)}">${dropdown('House','property_id',houseOptions(),x.property_id)}${input('Equipment name','name',x.name,'required')}${input('Location','location',x.location)}${input('Model','model',x.model)}${area('Notes','notes',x.notes)}<div class="actions"><button type="submit" class="btn primary">Save equipment</button>${x.id?'<button type="button" class="btn" data-action="back">Cancel editing</button>':''}</div></form>${x.id?mediaPanel('equipment',x.id,true):''}</div><div class="list">${arr('equipment').map(r=>`<button class="item" data-edit="${escapeHtml(r.id)}"><strong>${escapeHtml(r.name)}</strong><small>${escapeHtml(homeName(r.property_id))} • ${escapeHtml(r.model||'Model not recorded')}</small></button>`).join('')}</div>`;
 }
 function qr(){return `${section('PROPERTY LABELS','House QR codes','Print a distinct QR code for every property.')}<div class="card"><p>Open the QR generator using your private management link. No staff email or password is required.</p><a class="btn primary" href="qr-generator.html#access=${escapeHtml(privateKey)}" target="_blank" rel="noopener noreferrer">Open QR label generator</a><p class="small muted">Do not share this private management link. Employees can use the printed codes without signing in.</p></div>`;}
+function welcome(){
+ if(!manager())return overview();
+ const categoryLabels={welcome:'Getting started',shopping:'Shopping & essentials',medical:'Medical & emergency',fuel:'Fuel',eating:'Eating out',rubbish:'Rubbish & waste'};
+ const items=arr('welcome');
+ if(dataState.editing){
+  const isNew=dataState.editing==='new';
+  const x=isNew?{id:'',category:'welcome',title:'',group_label:'',town:'',body:'',phone:'',email:'',map_query:'',source_url:'',property_id:'',sort_order:100,published:false,needs_review:true,source_note:''}:recordBy(items,dataState.editing);
+  if(!x)return note('This welcome item could not be found.');
+  return `${section('LOCAL HANDBOOK',isNew?'Add welcome information':'Edit '+x.title,'Edits appear in the employee app as soon as you publish the item.')}
+   <button type="button" class="btn ghost" data-action="back">← Welcome information</button>
+   <form class="card" data-form="welcome" data-id="${escapeHtml(x.id)}">
+    ${dropdown('Section','category',Object.entries(categoryLabels),x.category)}
+    ${dropdown('Applies to','property_id',houseOptions(true),x.property_id||'')}
+    ${input('Title','title',x.title,'required maxlength="160"')}
+    ${input('Subcategory (e.g. Groceries, Hospitals)','group_label',x.group_label||'','maxlength="80"')}
+    ${input('Town / location','town',x.town||'','maxlength="100"')}
+    ${area('Description and instructions','body',x.body||'','maxlength="1800" rows="5"')}
+    ${input('Phone number (optional)','phone',x.phone||'','maxlength="50"')}
+    ${input('Email address (optional)','email',x.email||'','type="email" maxlength="254"')}
+    ${input('Google Maps search phrase (optional)','map_query',x.map_query||'','maxlength="250"')}
+    ${input('Official source website (optional)','source_url',x.source_url||'','type="url" maxlength="400" placeholder="https://..."')}
+    ${input('Display order','sort_order',x.sort_order??100,'type="number" min="0" max="9999"')}
+    <label class="cp-welcome-switch"><input type="checkbox" name="published" value="1" ${x.published?'checked':''}> Publish this item to residents</label>
+    <label class="cp-welcome-switch"><input type="checkbox" name="needs_review" value="1" ${x.needs_review?'checked':''}> Show "Details may change" until verified</label>
+    ${x.source_note?`<details class="cp-welcome-source"><summary>Original document / verification notes</summary><p>${escapeHtml(x.source_note)}</p></details>`:''}
+    <div class="actions"><button class="btn primary" type="submit">Save welcome information</button><button type="button" class="btn ghost" data-action="back">Cancel</button></div>
+   </form>`;
+ }
+ const published=items.filter(x=>x.published).length,review=items.filter(x=>x.needs_review).length;
+ return `${section('WELCOME HANDBOOK','Welcome & Local Info','Shared accommodation welcome details. You can edit phone numbers, services and instructions without changing the website code.')}
+  <div class="grid"><div class="stat"><strong>${published}</strong><small>Published entries</small></div><div class="stat"><strong>${review}</strong><small>Items to confirm</small></div><div class="stat"><strong>${items.length}</strong><small>Total entries</small></div></div>
+  <div class="notice">The original welcome letter has been imported. Medical phone numbers and the waste transfer station hours were checked against current sources. Other shops and contact details may need reconfirmation.</div>
+  <div class="actions"><button class="btn primary" type="button" data-welcome-new>+ Add welcome information</button><a class="btn ghost" href="index.html" target="_blank" rel="noopener noreferrer">View employee app</a></div>
+  ${Object.entries(categoryLabels).map(([cat,name])=>`<section class="cp-welcome-admin-group"><h2>${escapeHtml(name)} <span class="small muted">${items.filter(x=>x.category===cat).length}</span></h2>${items.filter(x=>x.category===cat).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(x=>`<button class="item cp-welcome-admin-row" type="button" data-edit="${escapeHtml(x.id)}"><span><strong>${escapeHtml(x.title)}</strong><small>${escapeHtml(x.town||'All areas')}${x.property_id?' • '+escapeHtml(homeName(x.property_id)):''}</small></span><span>${statusTag(x.published?'published':'draft')}${x.needs_review?'<small class="cp-review-flag">Review</small>':''}</span></button>`).join('')||'<p class="small muted">No entries yet.</p>'}</section>`).join('')}`;
+}
 function email(){
  const v=arr('emailSettings')[0]?.recipient_email||'';
  const notifications=arr('notifications');
@@ -99,7 +134,7 @@ function email(){
 }
 function render(){
  if(!dataState.payload)return failureScreen('Staff workspace is not connected.');
- const view={overview,jobs,inspections,manage,houses,workbook,guides,routines,equipment,email,qr}[dataState.tab]||overview;
+ const view={overview,jobs,inspections,manage,houses,welcome,workbook,guides,routines,equipment,email,qr}[dataState.tab]||overview;
  scaffold(view());
  if(dataState.firstLinkScroll && selectedTicket && dataState.tab==='jobs') {
    dataState.firstLinkScroll=false;
@@ -111,6 +146,7 @@ app.addEventListener('click',async event=>{
  const tab=event.target.closest('[data-tab]');if(tab){dataState.tab=tab.dataset.tab;dataState.editing=null;dataState.search='';dataState.error='';render();window.scrollTo(0,0);return;}
  const filter=event.target.closest('[data-job-filter]');if(filter){dataState.jobFilter=filter.dataset.jobFilter;render();return;}
  const edit=event.target.closest('[data-edit]');if(edit){dataState.editing=edit.dataset.edit;dataState.error='';render();window.scrollTo(0,0);return;}
+ const makeWelcome=event.target.closest('[data-welcome-new]');if(makeWelcome){dataState.tab='welcome';dataState.editing='new';render();window.scrollTo(0,0);return;}
  const action=event.target.closest('[data-action]');if(!action)return;
  if(action.dataset.action==='back'){dataState.editing=null;render();return;}
  if(action.dataset.action==='refresh'){await work(async()=>{},'Records refreshed');return;}
@@ -184,6 +220,10 @@ app.addEventListener('submit',async event=>{
   if(type==='routine'){return api('routine-save',{id:id||null,title:txt(f.get('title'),150),details:txt(f.get('details'),4000),every_days:Number(f.get('every_days')),property_id:txt(f.get('property_id')),responsible:txt(f.get('responsible'))});}
   if(type==='equipment'){return api('equipment-save',{id:id||null,name:txt(f.get('name'),200),location:txt(f.get('location'),200),model:txt(f.get('model'),200),notes:txt(f.get('notes'),2000),property_id:txt(f.get('property_id'))});}
   if(type==='email'){return api('email-save',{recipient_email:txt(f.get('recipient_email'),254)});}
+  if(type==='welcome'){
+   const value={id:id||null,category:txt(f.get('category'),30),property_id:txt(f.get('property_id'),25),title:txt(f.get('title'),160),body:txt(f.get('body'),1800),group_label:txt(f.get('group_label'),80),town:txt(f.get('town'),100),phone:txt(f.get('phone'),50),email:txt(f.get('email'),254),map_query:txt(f.get('map_query'),250),source_url:txt(f.get('source_url'),400),sort_order:Number(f.get('sort_order')),published:f.get('published')==='1',needs_review:f.get('needs_review')==='1'};
+   const result=await api('welcome-save',value);dataState.editing=null;return result;
+  }
   throw Error('Unknown form');
  },'Changes saved to Compendium.');
 });

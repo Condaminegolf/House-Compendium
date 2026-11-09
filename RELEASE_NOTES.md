@@ -1,34 +1,28 @@
-# Compendium Streamlined Release — 9 November 2026
+# Compendium — Welcome & Local Info release
 
-**No GitHub writes were performed.** This package is for manual root-folder upload.
+Implemented on 9 November 2026 using **Welcome info.docx**, a two-page staff accommodation information sheet.
 
-## Employee changes
-- Primary actions: **Something Wrong** and **Inspection Checklist**.
-- House-level pending maintenance requests directly below the primary actions.
-- Secondary shortcuts: Regular Care and Maintenance Requests.
-- House equipment and utility details collapsed into an expandable panel.
-- **Change house** preserved, returning to the 33-house search.
-- Instruction translation via a cached Supabase Edge Function for Filipino, Cebuano, Ilocano and Hiligaynon. The English source remains available and automated translation requires an API credential.
-- Explicit maintenance request input-language choice. Staff records are saved in English where translation has succeeded. Untranslated foreign-language submissions are blocked if their language is correctly selected.
+## What's new
 
-## Staff changes
-- Four primary navigation tabs, with management modules grouped under **Manage**.
-- Maintenance filters for Open / Waiting on parts / Completed / All.
-- Completion action prompts for a short resolution note, records completion time, and logs status changes.
-- Inspection reports with items needing attention can create a linked maintenance job (one linked job per inspection).
-- A **Send test email** action is available in Manage → Email.
+- A first-visit welcome banner for each house, dismissible and remembered on that device.
+- A permanent **Welcome & Local Info** action on every house dashboard.
+- Six easy-to-browse categories: welcome, shopping, medical, fuel, eating out, and rubbish.
+- Phone calling, email, map directions, and relevant official-information links.
+- Editable welcome entries under **Staff → Manage → Welcome & Local Info**: create, edit, hide or publish entries, adjust category/order and scope guidance to specific houses.
+- Automatic translation support for visible welcome instructions through the app's existing server translation layer when configured.
 
-## Live backend changes already applied
-- `pc_tickets.resolved_at`, `resolved_by_label`, `source_inspection_id`, `translated_to_english`.
-- `pc_ticket_status_history` with access restricted to the private backend.
-- `pc_translation_cache` and `pc_translation_usage` with row-level security.
-- `pc-public` version 11: English-normalised submissions, translation of displayed guidance, quota/cache controls.
-- `pc-staff` version 7: completion history, inspection follow-ups, email test.
+## Content and verification
 
-## Remaining prerequisites
-- **`OPENAI_API_KEY`** in Compendium's Supabase Edge Function Secrets for full translated instructions and non-English free-text submissions.
-- **`RESEND_API_KEY`** and **`PC_EMAIL_FROM`** for maintenance emails to `accommodation@arubial.au`.
-- Review translations of safety-critical procedures before relying on them for machinery, electrical, hot-water, or septic issues.
-- Final live phone verification after upload.
+- **31** entries imported to Supabase. **30** published; the Chinchilla dentist listing is awaiting verification.
+- **21** entries are marked for local rechecking, including potentially changed businesses and unverified historical contact details.
+- Source originally says Condamine dump 7 am–4 pm. Current Council information says **8 am–4 pm Tue/Thu/Sat/Sun**. The corrected hours are displayed, and the source discrepancy is recorded in the staff editor.
+- Medical numbers verified against current health service or clinic sites, not assumed current solely from the old letter.
+- Published listings not yet verified display **Details may change**.
 
-**Never commit secrets or private staff access URLs to a public repository.**
+## Not changed
+
+The existing 33 houses, QR codes, no-login resident experience, protected private staff link, maintenance requests, inspections, troubleshooting and Supabase data remain unchanged.
+
+## Deployment boundaries
+
+Supabase table and Edge Functions are already deployed. The website files have **not** been committed to GitHub. Follow `UPLOAD_INSTRUCTIONS.txt` to upload manually.
