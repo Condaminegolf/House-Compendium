@@ -4,59 +4,194 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#123e34">
-  <meta name="description" content="Scan your property QR code to view house-specific maintenance and inspection guides. No sign-in needed.">
-  <title>Property Care — Your House Guide</title>
-  <link rel="stylesheet" href="resident.css?v=20261109-qr">
+  <meta name="description" content="Select your employee house for maintenance guides, regular care, inspections and maintenance requests. No login or QR scan required.">
+  <title>Property Care — Choose Your House</title>
+  <link rel="stylesheet" href="resident.css?v=20261109-houses">
+  <style>
+    .house-directory { width: min(840px, 100%); margin: 0 auto; padding: 18px 18px 48px; }
+    .directory-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 6px 0 20px; }
+    .directory-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; }
+    .directory-mark { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: #124e3b; color: white; font-size: 25px; }
+    .directory-header a { font-size: 12px; color: #245f47; text-decoration: none; font-weight: 700; }
+    .directory-header a:focus-visible, .house-link:focus-visible { outline: 3px solid #abcdb7; outline-offset: 3px; }
+    .directory-hero { border-radius: 22px; padding: 26px; background: linear-gradient(125deg, #133e31, #32734e); color: #fff; }
+    .directory-hero .eyebrow { display: block; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #d4e8d9; }
+    .directory-hero h1 { margin: 8px 0 10px; font-size: clamp(27px, 5vw, 37px); line-height: 1.1; }
+    .directory-hero p { margin: 0; max-width: 620px; color: #e6f2e8; }
+    .directory-panel { margin: 18px 0; padding: 20px; background: #fff; border: 1px solid #dbe6dc; border-radius: 18px; }
+    .directory-panel h2 { font-size: 20px; margin: 0 0 8px; }
+    .directory-panel p { color: #62746c; margin: 0 0 15px; font-size: 14px; }
+    .directory-search-label { display: block; font-weight: 750; font-size: 13px; margin-bottom: 7px; }
+    #house-search { width: 100%; border: 1px solid #becfc1; background: #fff; border-radius: 12px; padding: 13px 15px; font-size: 16px; color: #163b2a; }
+    #house-search:focus { outline: 3px solid #cde5d2; border-color: #3c7652; }
+    .directory-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 18px 1px 10px; color: #5d7067; font-size: 13px; }
+    .directory-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .house-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; border: 1px solid #d9e7dd; border-radius: 14px; background: #fff; box-shadow: 0 5px 16px rgba(18,78,59,.045); text-decoration: none; color: #173c2e; transition: border-color .15s, background .15s; }
+    .house-link:hover { border-color: #86b59a; background: #f6fbf7; }
+    .house-link strong { display: block; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .house-link small { display: block; margin-top: 4px; color: #6d8175; font-size: 12px; }
+    .house-link .chevron { color: #2d6b4d; font-size: 23px; flex: none; }
+    .directory-notice { padding: 12px 14px; background: #f0f7ef; border-radius: 12px; color: #355844; font-size: 13px; margin-top: 14px; }
+    .directory-warning { background: #fff6e8; color: #805d2b; }
+    .directory-error { padding: 16px; border: 1px solid #f1c5b4; background: #fff5f2; border-radius: 12px; color: #853f2a; }
+    .directory-recent { margin-top: 18px; }
+    .directory-recent h2 { margin: 0 0 8px; font-size: 16px; }
+    .directory-footer { font-size: 12px; color: #66796e; line-height: 1.6; padding: 12px 1px; }
+    .directory-loading { padding: 16px 0; font-size: 14px; color: #557363; }
+    @media (max-width: 620px) {
+      .directory-list { grid-template-columns: 1fr; }
+      .directory-hero { padding: 23px 20px; }
+      .directory-panel { padding: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .house-link { transition: none; } }
+  </style>
 </head>
 <body>
-  <div id="app">
-    <div class="loading-screen">⌂<p>Opening Property Care…</p></div>
-  </div>
-
-  <!-- The public Supabase key belongs in the existing config.js; never add a secret key here. -->
+  <div id="app"><div class="loading-screen">⌂<p>Opening Property Care…</p></div></div>
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.105.0/dist/umd/supabase.min.js" defer></script>
   <script>
     'use strict';
     (() => {
       const root = document.getElementById('app');
-      const house = (new URLSearchParams(window.location.search).get('house') || '').trim();
-      const isRealHouseQr = /^[0-9a-f]{24}$/.test(house);
-      // Real QR links contain a 24-character random property identifier.
-      // Old DEMO-Hxx links must not be mistaken for real properties.
-      if (isRealHouseQr) {
-        const app = document.createElement('script');
-        app.src = 'resident.js?v=20261109-qr';
-        app.onerror = () => {
-          root.innerHTML = '<div class="intro"><span>⌂</span><h1>Unable to load Property Care</h1><p>Please check your connection and try scanning the house QR code again.</p><p class="tiny muted">If this continues, contact maintenance for help.</p></div>';
+      const params = new URLSearchParams(window.location.search);
+      const house = (params.get('house') || '').trim();
+      // Printed QR codes still work. Selecting a house uses a public Hxx alias,
+      // not its private 24-character QR identifier.
+      const validHouseLink = /^[a-f0-9]{24}$/.test(house) || /^PROPERTY-H\d{2,4}$/.test(house);
+      if (validHouseLink) {
+        const script = document.createElement('script');
+        script.src = 'resident.js?v=20261109-house-directory';
+        script.onerror = () => {
+          root.innerHTML = '<div class="house-directory"><div class="directory-error">The house guide could not load. Check your connection and <a href="index.html">choose a house again</a>.</div></div>';
         };
-        document.body.appendChild(app);
+        document.body.appendChild(script);
         return;
       }
-      // A bare website URL or demo/invalid code is NOT a real house.
-      // Do not load resident.js here: the older app would offer a sample house.
+      if (/^H\d{2,4}$/.test(house)) {
+        const redirect = new URL('index.html', location.href);
+        redirect.searchParams.set('house', 'PROPERTY-' + house);
+        location.replace(redirect.toString());
+        return;
+      }
+
       root.innerHTML = `
-        <div class="intro">
-          <span aria-hidden="true">⌂</span>
-          <h1>Property Care</h1>
-          <p>Housing guides, inspection checklists and maintenance requests for your house.</p>
-          <div class="card">
-            <h2>${house ? 'This is not a live house QR code' : 'Scan the QR code in your house'}</h2>
-            ${house
-              ? '<p>This link does not contain a valid property QR code. Please scan the printed QR sticker for your house instead.</p>'
-              : '<p>Use your phone camera to scan the QR sticker inside your house. Tap the link that appears to open your property information automatically.</p>'}
-            <p><strong>No password or employee sign-in required.</strong></p>
-          </div>
-          <div class="card" style="text-align:left">
-            <h2>What you can access</h2>
-            <p>🔧 Troubleshooting guides and repair help</p>
-            <p>🌱 Regular house and yard care</p>
-            <p>☑️ Inspection Checklist</p>
-            <p>🎫 Maintenance requests, including photos and videos</p>
-          </div>
-          <p class="tiny muted">Can't find the QR code? Contact your maintenance team for the correct sticker or link.</p>
-          <p class="tiny muted">Maintenance staff: <a href="staff.html">Open the protected staff dashboard</a></p>
+        <div class="house-directory">
+          <header class="directory-header">
+            <div class="directory-brand"><span class="directory-mark" aria-hidden="true">⌂</span><span>Property Care</span></div>
+            <a href="staff.html">Maintenance staff</a>
+          </header>
+          <section class="directory-hero">
+            <span class="eyebrow">Employee housing &amp; grounds</span>
+            <h1>Choose your house</h1>
+            <p>Find your property below to see regular care, troubleshooting, inspection checklists and maintenance requests. No QR scan or sign-in needed.</p>
+          </section>
+          <section class="directory-panel" aria-labelledby="search-title">
+            <h2 id="search-title">Find a property</h2>
+            <p>Search by address, house name or house ID. You can still use a house QR code to open it directly.</p>
+            <label for="house-search" class="directory-search-label">Search houses</label>
+            <input id="house-search" type="search" placeholder="e.g. Wambo St, Emu Park, H15" autocomplete="off" spellcheck="false">
+            <div id="recent-house" class="directory-recent" hidden></div>
+            <div id="directory-warning" class="directory-notice directory-warning" ${house ? '' : 'hidden'}>
+              The link you opened is not a current house link. Choose a house below instead.
+            </div>
+          </section>
+          <section aria-label="Available houses">
+            <div class="directory-meta"><strong id="house-count">Loading properties…</strong><span>No login required</span></div>
+            <div id="house-list" class="directory-list" aria-live="polite"><div class="directory-loading">Loading the available houses…</div></div>
+          </section>
+          <p class="directory-footer">For emergencies or unsafe conditions, contact emergency services or the maintenance team directly. A maintenance request is not an emergency alert. This house directory is accessible to anyone with the website link.</p>
         </div>`;
+
+      const countEl = document.getElementById('house-count');
+      const listEl = document.getElementById('house-list');
+      const recentEl = document.getElementById('recent-house');
+      const input = document.getElementById('house-search');
+      let houses = [];
+      const buildLink = id => {
+        const link = new URL('index.html', window.location.href);
+        link.search = '';
+        link.hash = '';
+        link.searchParams.set('house', 'PROPERTY-' + id);
+        return link.href;
+      };
+      const describe = item => {
+        const link = document.createElement('a');
+        link.className = 'house-link';
+        link.href = buildLink(item.id);
+        link.addEventListener('click', () => { try { localStorage.setItem('pc_last_house_id', item.id); } catch (_) {} });
+        const details = document.createElement('span');
+        const title = document.createElement('strong');
+        title.textContent = item.name || item.address || item.id;
+        details.appendChild(title);
+        const secondary = document.createElement('small');
+        const address = item.address && item.address !== item.name ? item.address : '';
+        secondary.textContent = address ? address + ' · ' + item.id : 'Property ID: ' + item.id;
+        details.appendChild(secondary);
+        link.appendChild(details);
+        const chevron = document.createElement('span');
+        chevron.className = 'chevron';
+        chevron.setAttribute('aria-hidden', 'true');
+        chevron.textContent = '›';
+        link.appendChild(chevron);
+        return link;
+      };
+      const render = () => {
+        const query = input.value.toLocaleLowerCase().trim();
+        const matches = houses.filter(item => [item.name, item.address, item.id].join(' ').toLocaleLowerCase().includes(query));
+        countEl.textContent = matches.length === houses.length ? houses.length + ' houses available' : matches.length + ' of ' + houses.length + ' houses';
+        listEl.replaceChildren();
+        if (!matches.length) {
+          const blank = document.createElement('div');
+          blank.className = 'directory-notice';
+          blank.textContent = 'No houses match that search. Try a different address or house name.';
+          listEl.appendChild(blank);
+        } else matches.forEach(item => listEl.appendChild(describe(item)));
+      };
+      input.addEventListener('input', render);
+
+      async function loadHouses() {
+        try {
+          const cfg = window.PROPERTY_CARE_CONFIG || {};
+          if (!cfg.supabaseUrl || !cfg.publishableKey) throw new Error('Compendium is not configured on this website.');
+          const endpoint = cfg.supabaseUrl.replace(/\/$/, '') + '/functions/v1/pc-public?action=houses';
+          const response = await fetch(endpoint, {
+            headers: { 'apikey': cfg.publishableKey },
+            cache: 'no-store'
+          });
+          const payload = await response.json().catch(() => null);
+          if (!response.ok || !payload || !Array.isArray(payload.houses)) throw new Error(payload?.error || 'The house list could not be loaded.');
+          houses = payload.houses.filter(item => /^H\d{2,4}$/.test(item.id)).map(item => ({
+            id: item.id,
+            name: typeof item.name === 'string' ? item.name : '',
+            address: typeof item.address === 'string' ? item.address : ''
+          }));
+          houses.sort((a, b) => Number(a.id.slice(1)) - Number(b.id.slice(1)));
+          const recent = (() => { try { return localStorage.getItem('pc_last_house_id'); } catch (_) { return null; } })();
+          const last = houses.find(item => item.id === recent);
+          if (last) {
+            recentEl.hidden = false;
+            const heading = document.createElement('h2');
+            heading.textContent = 'Recently opened';
+            recentEl.replaceChildren(heading, describe(last));
+          }
+          if (houses.filter(h => h.name.toLocaleLowerCase() === '37 wambo st').length > 1) {
+            const warning = document.createElement('p');
+            warning.className = 'directory-notice directory-warning';
+            warning.textContent = 'There are two entries for 37 Wambo St. Check the property ID with maintenance before lodging a request.';
+            recentEl.after(warning);
+          }
+          render();
+        } catch (error) {
+          countEl.textContent = 'House list unavailable';
+          listEl.replaceChildren();
+          const warning = document.createElement('div');
+          warning.className = 'directory-error';
+          warning.textContent = 'Unable to load the properties. Check your internet connection and reload, or use your house QR code. ' + (error?.message || '');
+          listEl.appendChild(warning);
+        }
+      }
+      loadHouses();
     })();
   </script>
 </body>
