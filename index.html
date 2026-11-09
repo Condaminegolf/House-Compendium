@@ -8,6 +8,7 @@
   <meta name="description" content="Select your employee house for maintenance guides, regular care, inspections and maintenance requests. No login or QR scan required.">
   <title>Property Care — Choose Your House</title>
   <link rel="stylesheet" href="resident.css?v=20261109-houses">
+  <link rel="stylesheet" href="something-wrong.css?v=20261109-guided1">
 
   <style>
     .house-maintenance-section { margin: 20px 0; }
@@ -80,7 +81,13 @@
         script.onload = () => {
           const addon = document.createElement('script');
           addon.src = 'house-maintenance.js?v=20261109-maintenance';
-          addon.onload = () => { if (typeof window.render === 'function') window.render(); };
+          addon.onload = () => {
+            const wizard = document.createElement('script');
+            wizard.src = 'something-wrong.js?v=20261109-guided1';
+            wizard.onload = () => { if (typeof window.render === 'function') window.render(); };
+            wizard.onerror = () => { if (typeof window.render === 'function') window.render(); };
+            document.body.appendChild(wizard);
+          };
           document.body.appendChild(addon);
         };
         script.onerror = () => {

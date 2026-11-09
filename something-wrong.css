@@ -1,0 +1,56 @@
+/* Scoped to the Something Wrong tab; does not alter staff/house navigation. */
+.sw-intro{margin-top:15px}
+.sw-search{background:#fff;border:1px solid var(--line,#d9e6dc);border-radius:16px;padding:16px;margin:14px 0 18px}
+.sw-search label{font-weight:800;font-size:14px;display:block;margin-bottom:9px;color:var(--ink,#193930)}
+.sw-search input{display:block;width:100%;min-height:46px;border:1px solid #b4cebd;border-radius:11px;padding:10px 13px;background:#fff;font-size:16px;color:#193930}
+.sw-search input:focus{outline:3px solid #d9eedd;border-color:#377652}
+.sw-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 10px}
+.sw-section-title h2{font-size:19px;margin:0}
+.sw-section-title span{font-size:12px;color:var(--muted,#60716a)}
+.sw-quickgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sw-issue,.sw-category{display:flex;width:100%;align-items:center;text-align:left;gap:12px;background:#fff;border:1px solid #d5e4d9;border-radius:14px;padding:14px;color:var(--ink,#193930);box-shadow:0 2px 9px rgba(21,68,48,.035);min-width:0;cursor:pointer}
+.sw-issue:hover,.sw-category:hover{border-color:#69a37d;background:#f8fcf8}
+.sw-issue:focus-visible,.sw-category:focus-visible,.sw-back:focus-visible,.sw-check:focus-within,.sw-approved-link:focus-visible{outline:3px solid #add1b6;outline-offset:2px}
+.sw-issue-icon,.sw-category-icon{flex:0 0 auto;border-radius:12px;background:#ecf5ed;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:23px}
+.sw-issue-copy,.sw-category-copy{display:flex;min-width:0;flex:1;flex-direction:column;gap:3px}
+.sw-issue-copy strong,.sw-category-copy strong{font-size:14px;line-height:1.35}
+.sw-issue-copy small,.sw-category-copy small{display:block;color:#60716a;font-size:12px;line-height:1.35}
+.sw-category-copy strong{font-size:15px}
+.sw-chevron{margin-left:auto;font-size:24px;line-height:1;color:#74917e}
+.sw-count{font-size:11px;font-weight:700;color:#427757;margin-top:3px}
+.sw-category-grid,.sw-issue-list{display:grid;grid-template-columns:1fr;gap:10px}
+.sw-category{min-height:92px}
+.sw-quickgrid .sw-issue{min-height:95px;align-items:flex-start;flex-direction:column;gap:6px}
+.sw-quickgrid .sw-issue-icon{width:35px;height:35px;font-size:20px}
+.sw-quickgrid .sw-chevron{display:none}
+.sw-help{margin-top:21px}
+.sw-help strong{font-size:16px}
+.sw-help p{color:#5e7265;font-size:13px}
+.sw-back{display:inline-flex;align-items:center;gap:7px;background:transparent;border:0;color:#225d42;padding:10px 2px;margin:8px 0;font-weight:800;font-size:14px;cursor:pointer}
+.sw-steps-summary{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:14px 0 16px;font-size:12px;font-weight:700;color:#4e6758}
+.sw-steps-summary span:last-child{background:#eaf4e9;border-radius:25px;padding:5px 10px;color:#21643a}
+.sw-alert{border-left:4px solid #d39445;border-radius:12px;background:#fff8eb;padding:14px 16px;margin:14px 0 19px}
+.sw-alert-urgent{border-left-color:#ad4c35;background:#fff1ec}
+.sw-alert strong{color:#713a18}
+.sw-alert p{margin:6px 0 0;line-height:1.55;font-size:13px}
+.sw-checks{margin-bottom:20px}
+.sw-checks h2,.sw-approved h2,.sw-next h2{font-size:18px;margin:0 0 8px}
+.sw-checks>p{margin:0 0 12px}
+.sw-check{display:flex;align-items:flex-start;gap:11px;cursor:pointer;background:#fff;border:1px solid #d5e4d9;border-radius:12px;padding:13px;margin:9px 0;font-size:14px;line-height:1.5;position:relative}
+.sw-check input{width:19px;height:19px;flex:0 0 19px;margin:3px 0 0;accent-color:#236540}
+.sw-check-number{width:26px;line-height:26px;text-align:center;flex:0 0 26px;border-radius:50%;background:#edf4eb;color:#27563e;font-weight:800;font-size:12px}
+.sw-check.is-checked,.sw-check:has(input:checked){border-color:#7cab87;background:#f3f9f3}
+.sw-approved{margin:22px 0}
+.sw-approved-link{display:block;text-align:left;width:100%;border:1px solid #cce2cd;background:#f5faf4;padding:13px 15px;border-radius:12px;margin:10px 0;color:#1e5438}
+.sw-approved-link strong,.sw-approved-link span{display:block}
+.sw-approved-note summary{font-weight:750;cursor:pointer}
+.sw-approved-note p{white-space:pre-line;overflow-wrap:anywhere;font-size:14px;line-height:1.6}
+.sw-info{background:#eff6f1;border-radius:12px;padding:15px;margin:18px 0;color:#32533f}
+.sw-info p{margin:6px 0 0;font-size:13px}
+.sw-next{margin:20px 0 12px}
+.sw-next p{font-size:14px}
+.sw-next .sw-done{margin-top:9px}
+.sw-ticket-context{font-size:12px;color:#2c6642;background:#edf6ed;border-radius:8px;padding:10px}
+.sw-source-note{margin:18px 2px 25px;font-size:11px;color:#718077;line-height:1.5}
+@media(min-width:620px){.sw-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sw-quickgrid{grid-template-columns:repeat(4,minmax(0,1fr))}.sw-quickgrid .sw-issue{min-height:142px}.sw-issue-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:380px){.sw-quickgrid{grid-template-columns:1fr}.sw-quickgrid .sw-issue{flex-direction:row;align-items:center;min-height:65px}}
