@@ -23,5 +23,20 @@
       <details class="card cp-house-details"><summary>🏠 House details, water systems &amp; equipment</summary>${info('Address',h.address)}${info('Water supply',h.water_supply)}${info('Water tanks',h.water_tanks_info)}${info('Water pumps',h.water_pump_info)}${info('Hot water system',h.hot_water_type)}${info('Septic / wastewater',h.septic_system_info)}${info('Power supplier',h.power_supplier)}${info('Electrical board information',h.power_board_info)}${info('Rubbish and skip bins',h.rubbish_arrangements)}${info('Other house notes',h.approved_guide_notes)}${media('property',h.id)}${(s.equipment||[]).map(x=>`<div class="cp-equipment"><strong>${safe(x.name)}</strong><div class="tiny muted">${safe(x.location||'')} ${safe(x.model||'')}</div>${x.notes?`<p>${safe(x.notes)}</p>`:''}${media('equipment',x.id)}</div>`).join('')}</details>
       ${emergency()}`;
   };
+  // Shared safety language is editable in the private Accommodation Content Editor.
+  // 000 and the ticket disclaimer are deliberately permanent safeguards.
+  if (typeof emergency === 'function') {
+    const oldEmergency=emergency;
+    emergency=function editableSafetyPanel(){
+      const guidance=s.emergency_guidance;
+      if(!guidance)return oldEmergency();
+      const h=s.house||{},phone=String(h.emergency_contact_number||'').replace(/[^+0-9]/g,'');
+      const block=value=>`<p style="white-space:pre-line">${safe(value)}</p>`;
+      const houseNote=h.emergency_instructions?`<div><strong>For this house:</strong>${block(h.emergency_instructions)}</div>`:'';
+      const contact=phone?`<a href="tel:${safe(phone)}">☎ ${safe(h.emergency_contact_name||'Urgent maintenance')}: ${safe(h.emergency_contact_number)}</a>`
+        :'<p><b>No emergency maintenance number is listed for this house. Contact the accommodation team directly.</b></p>';
+      return `<div class="emergency"><b>🚨 ${safe(guidance.heading||'Emergencies and unsafe conditions')}</b>${block(guidance.emergency_text||'Keep clear of danger.')}${block(guidance.unsafe_text||'Avoid unsafe areas and call maintenance.')}${houseNote}<p><strong>Immediate danger: call <a href="tel:000">000</a>.</strong> A maintenance request is not an emergency alert.</p>${contact}</div>`;
+    };
+  }
   if (s.house) render();
 })();

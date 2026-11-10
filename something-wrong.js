@@ -13,7 +13,7 @@
     {id:'water', icon:'🚿', title:'Water & hot water', desc:'No water, low pressure or no hot water'},
     {id:'drains', icon:'🚰', title:'Toilets, drains & septic', desc:'Slow drains, wastewater, alarms and taps'},
     {id:'appliances', icon:'🔌', title:'Appliances & air conditioning', desc:'Fridge, microwave, washing machine, TV and more'},
-    {id:'gutters', icon:'🏠', title:'Roof & gutters', desc:'Overflowing gutters and roof drainage'},
+    {id:'building', icon:'🏠', title:'Structural damage to building', desc:'Broken windows, leaks in the house, holes in walls, roof and gutter damage'},
     {id:'mowers', icon:'🌿', title:'Mowers & outdoor equipment', desc:'Mower not starting or not cutting'}
   ];
   const issues = [
@@ -68,7 +68,19 @@
     {id:'aircon',category:'appliances',title:'Air conditioner or remote not working',short:'Air conditioner does not respond normally',terms:'ac aircon air-conditioning cooling heating remote batteries',row:[24],
      checks:['Check whether the remote has a visible display or indicator.','If safe, replace accessible remote-control batteries using the correct type.','Note any error code or unusual sound shown by the air conditioner.'],
      warning:'Do not remove electrical covers, open the unit or modify refrigerant pipework.',matches:['air conditioner','air conditioner remote']},
-    {id:'gutters',category:'gutters',title:'Water overflowing gutters',short:'Rainwater spills over the gutter edge',terms:'gutter roof downpipe rain overflowing stormwater',row:[15],
+    {id:'broken-window',category:'building',title:'Broken window or glass',short:'Cracked or shattered glass, damaged window frame or insecure opening',terms:'broken window cracked glass shattered pane smashed frame unsafe sharp edge',row:[],
+     checks:['Keep everyone, especially children and pets, away from broken glass.','From a safe position, note which room or window is damaged.','Photograph the damage only if you can do so without approaching broken glass.'],
+     warning:'Do not touch or remove broken glass, climb through a damaged window, or try to repair the frame. Report immediately if the property cannot be secured.',urgency:'urgent',matches:['window','glass']},
+    {id:'inside-leak',category:'building',title:'Water leaking inside the house',short:'Water entering through a roof, ceiling, wall, window or internal surface',terms:'roof leak ceiling leak storm water inside house wet plaster internal leak water ingress',row:[],
+     checks:['From a dry, safe area, note the room and location of the water.','Move away from sagging ceilings, damaged plaster and any water near lights or electrical fittings.','If safe, move belongings away from small drips without touching wiring or damaged building materials.'],
+     warning:'Water near electricity, a sagging ceiling or rapidly spreading leaks require urgent assistance. Do not enter the roof, use ladders or touch electrical switches near water.',urgency:'urgent',matches:['leak','water inside','ceiling']},
+    {id:'wall-damage',category:'building',title:'Holes or damage to walls and ceilings',short:'Holes, cracks, collapsed plasterboard or damaged internal surfaces',terms:'holes walls plaster dent cracks ceiling damaged gyprock wallboard structure',row:[],
+     checks:['Note which room and surface is affected, from a safe position.','Check from a distance whether material is loose or falling and keep clear if it is.','If safe, photograph the damage for maintenance.'],
+     warning:'Do not remove loose material, cut into walls, or attempt repairs. If a wall or ceiling looks unstable, leave that area and contact maintenance urgently.',urgency:'priority',matches:['wall','hole','ceiling','structural']},
+    {id:'structural-other',category:'building',title:'Other structural damage',short:'Damaged roof, doors, floors, stairs, foundations or building framework',terms:'building structure damaged roof cracked floor loose door stairs verandah storm damage',row:[],
+     checks:['Keep away from cracked, leaning, loose or falling parts of the building.','Identify which part of the structure is affected from a safe distance.','If safe, take a photo and explain whether the damage is getting worse.'],
+     warning:'Do not walk beneath damaged roofing or use unstable stairs, floors or verandahs. Leave the area and telephone maintenance urgently if there is any collapse risk.',urgency:'urgent',matches:['structure','roof','storm','building']},
+    {id:'gutters',category:'building',title:'Water overflowing gutters',short:'Rainwater spills over the gutter edge',terms:'gutter roof downpipe rain overflowing stormwater',row:[15],
      checks:['Note which side of the building is overflowing from ground level.','If safe, take a photograph without using a ladder.','Report whether water is entering the building or running near electrical equipment.'],
      warning:'Do not climb onto roofs or ladders to clear gutters. Water near live electrical equipment requires urgent attention.',matches:['water overflowing gutters','gutter']},
     {id:'mower-start',category:'mowers',title:'Mower will not start',short:'The mower cannot be started normally',terms:'mower lawn not starting engine petrol fuel oil',row:[40],
@@ -79,7 +91,7 @@
      warning:'Do not reach under the deck, handle blades or belts or remove safety guards. The maintenance team must inspect moving parts.',matches:['mower not cutting','starting but not cutting']}
   ];
 
-  // Reference rows in the uploaded worksheet are mapped into 20 distinct fault types.
+  // Workbook faults plus extra structural-damage situations are grouped into practical fault types.
   // The electrical-board and septic-location background rows are deliberately excluded
   // from employee instructions until house-by-house verification.
   const ui = {category:null,issue:null,query:'',checked:new Set(),complete:false};

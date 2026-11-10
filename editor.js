@@ -6,7 +6,7 @@
   const cfg=window.PROPERTY_CARE_CONFIG||{};
   const key=new URLSearchParams(location.hash.replace(/^#/,'' )).get('access')||'';
   const endpoint=String(cfg.supabaseUrl||'').replace(/\/$/,'')+'/functions/v1/pc-editor';
-  const tabs=[['overview','⌂','Overview'],['houses','🏠','House details'],['bulk','⇄','Bulk update'],['articles','📘','Care & articles'],['wizard','🔧','Guided steps'],['media','🎬','Videos & photos']];
+  const tabs=[['overview','⌂','Overview'],['houses','🏠','House details'],['safety','🚨','Emergencies & safety'],['bulk','⇄','Bulk update'],['articles','📘','Care & articles'],['wizard','🔧','Guided steps'],['media','🎬','Videos & photos']];
   const fields=[
     {key:'emergency_contact_name',label:'Emergency maintenance contact',group:'Emergency',placeholder:'Name or team'},
     {key:'emergency_contact_number',label:'Emergency maintenance phone',group:'Emergency',placeholder:'Phone number'},
@@ -66,11 +66,26 @@
      ${state.error?`<div class="error" role="alert">${E(state.error)}</div>`:''}
      ${view}<div class="role-note">Updates save to Compendium, not this browser. Draft guides remain hidden. Public house information is available to anyone who opens that house; do not enter passwords, sensitive access codes or personal resident information. Private editor link expires ${E(date(state.data.expires_at))}.</div></div>`;
   }
+  function safetyPage(){
+    const g=state.data?.emergencyGuidance||{};
+    return `${title('EMERGENCY & SAFETY','Emergencies and unsafe conditions','Edit the warning shown across all houses. House-specific emergency contacts and instructions are still managed under House details or Bulk update.')}
+      <div class="card"><div class="notice"><strong>Emergency safety notice:</strong> The app will always include a separate instruction to call 000 for immediate danger and explain that maintenance tickets are not emergency alerts. Those safeguards cannot be removed by this editor.</div>
+      <form data-form="emergency-guidance">
+      ${field('heading','Safety panel heading',g.heading||'Emergencies and unsafe conditions',false,'required minlength="3" maxlength="120"')}
+      ${field('emergency_text','What to do in an emergency',g.emergency_text||'',true,'required minlength="10" maxlength="1800" rows="4"')}
+      ${field('unsafe_text','Unsafe conditions — what to avoid and when to call maintenance',g.unsafe_text||'',true,'required minlength="10" maxlength="1800" rows="5"')}
+      <label class="choice"><input type="checkbox" name="confirmed" required> I have reviewed this information for all accommodation properties.</label>
+      <button class="btn primary" type="submit">Save safety information for all houses</button>
+      </form>
+      <p class="small muted">This shared message is visible in the red safety panel on all 33 houses and within Something Wrong. Changes will appear after the employee page refreshes.</p></div>
+      <div class="card"><h2>House-specific contacts and warnings</h2><p>For the on-call contact, emergency phone number, or a particular house's emergency procedure, use <b>House details</b>. To apply one contact or instruction to many houses, use <b>Bulk update</b>.</p><div class="actions"><button class="btn" type="button" data-tab="houses">Edit a house</button><button class="btn" type="button" data-tab="bulk">Bulk emergency changes</button></div></div>`;
+  }
   function overview(){
     const g=record('guides'),a=record('articles');
     return `${title('Your content workspace','Manage accommodation information','Update house details, apply shared changes, publish safe guides and upload photos or videos without using the staff dashboard.')}
       <div class="stats"><div class="stat"><b>${homes().length}</b><span>House records</span></div><div class="stat"><b>${g.length}</b><span>Step-by-step guides</span></div><div class="stat"><b>${a.length}</b><span>Care and help articles</span></div><div class="stat"><b>${record('media').length}</b><span>Uploaded photos/videos</span></div></div>
       <div class="grid"><div class="card"><h2>🏠 House information</h2><p class="muted">Emergency contacts, water tanks, pumps, septics, power and rubbish arrangements for individual homes.</p><button class="btn primary" data-tab="houses">Edit house details</button></div>
+      <div class="card"><h2>🚨 Emergencies and unsafe conditions</h2><p class="muted">Update the shared emergency warning shown on all house pages, with unremovable instructions to call 000 for immediate danger.</p><button class="btn primary" data-tab="safety">Edit safety information</button></div>
       <div class="card"><h2>⇄ Bulk changes</h2><p class="muted">Select a few properties or all 33. Only the fields you choose are overwritten.</p><button class="btn primary" data-tab="bulk">Edit multiple houses</button></div>
       <div class="card"><h2>📚 Guides & instructions</h2><p class="muted">Edit existing workbook articles or step-based troubleshooting guides; draft, review and publish to selected houses.</p><div class="actions"><button class="btn" data-tab="articles">Care articles</button><button class="btn" data-tab="wizard">Guided steps</button></div></div>
       <div class="card"><h2>🎬 Videos & photos</h2><p class="muted">Attach a demonstration to a property, an article, or one step of a guide. You can add one video to all houses.</p><button class="btn primary" data-tab="media">Upload video or photo</button></div></div>
@@ -194,7 +209,7 @@
   }
   function render(){
     if(!state.data)return;
-    const views={overview,houses:houseDetails,bulk:bulkPage,articles:articlePage,wizard:wizardPage,media:mediaPage};
+    const views={overview,houses:houseDetails,safety:safetyPage,bulk:bulkPage,articles:articlePage,wizard:wizardPage,media:mediaPage};
     shell((views[state.tab]||overview)());
   }
   function formScope(form){
@@ -287,6 +302,12 @@
     event.preventDefault();if(state.busy)return;
     const type=form.dataset.form;const f=new FormData(form);
     try{
+      if(type==='emergency-guidance'){
+        if(!f.has('confirmed'))throw Error('Confirm you reviewed this safety guidance.');
+        const heading=String(f.get('heading')||'').trim(),emergency_text=String(f.get('emergency_text')||'').trim(),unsafe_text=String(f.get('unsafe_text')||'').trim();
+        if(heading.length<3||emergency_text.length<10||unsafe_text.length<10)throw Error('Complete all safety fields before saving.');
+        await perform(()=>api('save-emergency-guidance',{heading,emergency_text,unsafe_text,confirmed:true}));
+      }
       if(type==='house'){
         const current=homes().find(x=>x.id===state.houseId)||{};
         const changes={};for(const fieldDef of fields){const value=String(f.get(fieldDef.key)||'').trim();if(value!==String(current[fieldDef.key]||''))changes[fieldDef.key]=value;}
